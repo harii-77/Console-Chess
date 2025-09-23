@@ -154,8 +154,7 @@ public class ChessGame {
      * Check if the game is over.
      */
     private boolean isGameOver() {
-        // For now, we'll implement a simple win condition
-        // In a full implementation, this would check for checkmate, stalemate, etc.
+        // In a full implementation, this would check for additional conditions
         return false;
     }
 
@@ -178,7 +177,7 @@ public class ChessGame {
                     gameRunning = false;
                 }
             } else {
-                // Stalemate detection (optional): not in check and no legal moves
+                // Stalemate detection: not in check and no legal moves
                 if (!board.hasAnyLegalMove(opponent.getColor())) {
                     System.out.println("Stalemate! The game is a draw.");
                     gameRunning = false;
