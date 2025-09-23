@@ -26,6 +26,15 @@ javac -version
 mvn -v
 ```
 
+### Install Maven on Windows (if `mvn` is not recognized)
+
+1. Download Maven (binary zip) from `https://maven.apache.org/download.cgi`.
+2. Extract to a folder, e.g., `C:\Program Files\Apache\maven-3.9.x`.
+3. Add `C:\Program Files\Apache\maven-3.9.x\bin` to your System PATH.
+   - Windows Search → “Edit the system environment variables” → Environment Variables → Path → Edit → New.
+4. Open a new terminal and run `mvn -v` to verify.
+5. Alternatively, use the Windows script in Option 3 (no Maven required).
+
 ## Run the Game
 
 ### Option 1: Maven (cross-platform)
@@ -46,6 +55,8 @@ java -cp target/classes com.consolechess.ChessGame
 ```bat
 run.bat
 ```
+
+This compiles with `javac` and runs the game without Maven.
 
 ## How to Play
 
