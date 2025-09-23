@@ -97,7 +97,6 @@ public class Board {
             return false; // Cannot capture own piece
         }
         
-<<<<<<< HEAD
         // First ensure the piece's movement pattern is valid and, where relevant,
         // that the path between from and to is clear
         if (!isValidPieceMove(piece, from, to)) {
@@ -114,9 +113,6 @@ public class Board {
         setPiece(to, captured);
         
         return !leavesKingInCheck;
-=======
-        return isValidPieceMove(piece, from, to);
->>>>>>> 75e227ed68b966bd36186154ca799155c208468a
     }
     
     /**
@@ -177,14 +173,10 @@ public class Board {
     }
     
     private boolean isValidRookMove(Position from, Position to, int rowDiff, int colDiff) {
-<<<<<<< HEAD
         if (!((rowDiff == 0 && colDiff > 0) || (colDiff == 0 && rowDiff > 0))) {
             return false;
         }
         return isPathClear(from, to);
-=======
-        return (rowDiff == 0 && colDiff > 0) || (colDiff == 0 && rowDiff > 0);
->>>>>>> 75e227ed68b966bd36186154ca799155c208468a
     }
     
     private boolean isValidKnightMove(int rowDiff, int colDiff) {
@@ -192,7 +184,6 @@ public class Board {
     }
     
     private boolean isValidBishopMove(Position from, Position to, int rowDiff, int colDiff) {
-<<<<<<< HEAD
         if (!(rowDiff == colDiff && rowDiff > 0)) {
             return false;
         }
@@ -201,12 +192,6 @@ public class Board {
     
     private boolean isValidQueenMove(Position from, Position to, int rowDiff, int colDiff) {
         // Path clearance is handled in the respective functions
-=======
-        return rowDiff == colDiff && rowDiff > 0;
-    }
-    
-    private boolean isValidQueenMove(Position from, Position to, int rowDiff, int colDiff) {
->>>>>>> 75e227ed68b966bd36186154ca799155c208468a
         return isValidRookMove(from, to, rowDiff, colDiff) || 
                isValidBishopMove(from, to, rowDiff, colDiff);
     }
@@ -214,7 +199,6 @@ public class Board {
     private boolean isValidKingMove(int rowDiff, int colDiff) {
         return (rowDiff <= 1 && colDiff <= 1) && (rowDiff > 0 || colDiff > 0);
     }
-<<<<<<< HEAD
 
     /**
      * Check that all squares between from (exclusive) and to (exclusive) are empty.
@@ -332,8 +316,6 @@ public class Board {
     private PieceColor opposite(PieceColor color) {
         return color == PieceColor.WHITE ? PieceColor.BLACK : PieceColor.WHITE;
     }
-=======
->>>>>>> 75e227ed68b966bd36186154ca799155c208468a
     
     @Override
     public String toString() {
