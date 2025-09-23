@@ -1,4 +1,4 @@
-﻿package com.consolechess;
+package com.consolechess;
 
 import java.util.Scanner;
 
@@ -195,7 +195,8 @@ public class ChessGame {
      */
     private Position parsePosition(String square) {
         int file = square.charAt(0) - 'a';
-        int rank = square.charAt(1) - '1';
-        return new Position(rank, file);
+        int rankNum = square.charAt(1) - '0'; // ranks 1-8
+        int row = 8 - rankNum; // rank 1 -> row 7 (bottom), rank 8 -> row 0 (top)
+        return new Position(row, file);
     }
 }

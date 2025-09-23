@@ -1,4 +1,4 @@
-﻿package com.consolechess;
+package com.consolechess;
 
 /**
  * Represents a player in the chess game.

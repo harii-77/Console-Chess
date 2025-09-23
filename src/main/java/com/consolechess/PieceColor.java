@@ -1,4 +1,4 @@
-﻿package com.consolechess;
+package com.consolechess;
 
 /**
  * Enum representing the color of chess pieces.

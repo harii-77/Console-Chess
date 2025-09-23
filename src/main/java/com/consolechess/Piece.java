@@ -1,4 +1,4 @@
-﻿package com.consolechess;
+package com.consolechess;
 
 /**
  * Represents a chess piece with its type and color.

@@ -1,4 +1,4 @@
-﻿package com.consolechess;
+package com.consolechess;
 
 /**
  * Represents a position on the chess board.
@@ -36,6 +36,6 @@ public class Position {
     
     @Override
     public String toString() {
-        return (char)('a' + column) + String.valueOf(row + 1);
+        return (char)('a' + column) + String.valueOf(8 - row);
     }
 }

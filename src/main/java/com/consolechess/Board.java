@@ -1,4 +1,4 @@
-﻿package com.consolechess;
+package com.consolechess;
 
 /**
  * Represents the chess board and handles piece placement and movement validation.
