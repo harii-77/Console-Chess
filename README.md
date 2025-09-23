@@ -58,6 +58,21 @@ run.bat
 
 This compiles with `javac` and runs the game without Maven.
 
+### Option 4: Manual compile and run on Windows (no Maven)
+
+If you prefer direct `javac`/`java` commands:
+
+```bat
+REM Create output folder if it doesn't exist
+if not exist target\classes mkdir target\classes
+
+REM Compile all sources
+javac -d target\classes -cp target\classes src\main\java\com\consolechess\*.java
+
+REM Run the game
+java -cp target/classes com.consolechess.ChessGame
+```
+
 ## How to Play
 
 1. Start the program and enter player names when prompted.
