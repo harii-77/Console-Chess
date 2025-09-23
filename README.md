@@ -1,86 +1,101 @@
 ﻿# Console Chess
 
-A console-based implementation of the game Chess using Java.
+A clean, console-based two-player chess game written in Java.
 
 ## Features
 
-- Complete chess board with all pieces in starting positions
-- Two-player gameplay with turn-based moves
-- Move validation according to chess rules
-- Console-based user interface
-- Standard algebraic notation for moves (e.g., "e2e4")
-- Input validation and error handling
+- Board setup with standard starting positions
+- Turn-based two-player gameplay
+- Legal move validation (includes path blocking for sliders)
+- King safety: moves that leave your king in check are rejected
+- Check, checkmate, and stalemate detection with messages
+- Pawn promotion (Q/R/B/N) when reaching the back rank
+- Simple console UI with friendly prompts and input validation
 
-## Requirements
+## Prerequisites
 
-- Java 11 or higher
-- Maven 3.6 or higher
+- Java 11+ (JDK)
+- Maven 3.6+
+- Windows users: optional `run.bat` convenience script included
 
-## How to Run
+Verify tools:
 
-### Using Maven
+```bash
+java -version
+javac -version
+mvn -v
+```
+
+## Run the Game
+
+### Option 1: Maven (cross-platform)
+
 ```bash
 mvn compile exec:java
 ```
 
-### Using Java directly
-```bash
-# Compile the project
-mvn compile
+### Option 2: Build then run
 
-# Run the main class
+```bash
+mvn compile
 java -cp target/classes com.consolechess.ChessGame
+```
+
+### Option 3: Windows batch script
+
+```bat
+run.bat
 ```
 
 ## How to Play
 
-1. Run the program
-2. Enter player names when prompted
-3. Enter moves using standard algebraic notation:
-   - Format: `fromSquare toSquare` (e.g., `e2e4`)
-   - Squares are denoted as `a1` to `h8`
-4. Type `quit` or `q` to exit
-5. Type `help` for available commands
+1. Start the program and enter player names when prompted.
+2. Enter moves in coordinate notation: `e2e4` means from `e2` to `e4`.
+   - Files: `a` to `h`, Ranks: `1` to `8`.
+3. Commands:
+   - `help`: show usage
+   - `quit` or `q`: exit
+4. Special rules implemented:
+   - Check: after a move, if the opponent is in check, you’ll see “Check!”.
+   - Checkmate: if the opponent has no legal moves while in check, the winner is announced and the game ends.
+   - Stalemate: if the opponent has no legal moves and is not in check, the game is a draw.
+   - Pawn promotion: when a pawn reaches the last rank, choose `Q`, `R`, `B`, or `N`.
+
+### Quick demo sequences
+
+- Scholar’s Mate (White wins):
+  - White: `e2e4`, Black: `e7e5`, White: `d1h5`, Black: `b8c6`, White: `f1c4`, Black: `g7g6`, White: `h5f7`
 
 ## Project Structure
 
 ```
 src/
- main/java/com/consolechess/
-    ChessGame.java      # Main game class
-    Board.java          # Chess board logic
-    Piece.java          # Chess piece representation
-    Position.java       # Board position
-    Player.java         # Player representation
-    PieceType.java      # Piece types enum
-    PieceColor.java     # Piece colors enum
- test/java/com/consolechess/
-     BoardTest.java      # Board unit tests
-     PieceTest.java      # Piece unit tests
-     PositionTest.java   # Position unit tests
+  main/java/com/consolechess/
+    ChessGame.java    # Game loop and CLI
+    Board.java        # Board state and validation (including check logic)
+    Piece.java        # Piece model
+    Position.java     # Coordinate model
+    Player.java       # Player info
+    PieceType.java    # Enum of piece types
+    PieceColor.java   # Enum of colors
+  test/java/com/consolechess/
+    BoardTest.java    # Sample unit tests
+    PieceTest.java
+    PositionTest.java
 ```
 
 ## Testing
 
-Run the unit tests using Maven:
 ```bash
 mvn test
 ```
 
-## Implementation Details
+## Troubleshooting
 
-This implementation includes:
-- Object-oriented design with proper separation of concerns
-- Move validation for all chess pieces
-- Clean console interface
-- Comprehensive unit tests
-- Maven project structure
+- “mvn: command not found”: install Maven and ensure it’s on your PATH.
+- Windows PowerShell quirks with piping: prefer Option 1 or 2 above.
+- If Java version is too new/old, use JDK 11+.
 
-## Future Enhancements
+## License
 
-- Check and checkmate detection
-- Castling implementation
-- En passant capture
-- Pawn promotion
-- Stalemate detection
-- Game history and undo functionality
+MIT (or your preferred license). Update this section if you choose a different license.
