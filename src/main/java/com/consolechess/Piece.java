@@ -6,6 +6,12 @@ package com.consolechess;
 public class Piece {
     private final PieceType type;
     private final PieceColor color;
+    // ANSI color codes for nicer terminal rendering
+    private static final String ANSI_RESET = "\u001B[0m";
+    private static final String ANSI_BRIGHT_WHITE = "\u001B[97m";
+    private static final String ANSI_BRIGHT_CYAN = "\u001B[96m";
+    // Toggle to disable colors if your terminal doesn't support ANSI
+    private static final boolean USE_COLORS = true;
     
     public Piece(PieceType type, PieceColor color) {
         this.type = type;
@@ -23,7 +29,13 @@ public class Piece {
     @Override
     public String toString() {
         String symbol = type.toString();
-        return color == PieceColor.WHITE ? symbol : symbol.toLowerCase();
+        String rendered = color == PieceColor.WHITE ? symbol : symbol.toLowerCase();
+        if (!USE_COLORS) {
+            return rendered;
+        }
+        // White pieces in bright white, black pieces in bright cyan
+        String colorCode = (color == PieceColor.WHITE) ? ANSI_BRIGHT_WHITE : ANSI_BRIGHT_CYAN;
+        return colorCode + rendered + ANSI_RESET;
     }
     
     @Override
