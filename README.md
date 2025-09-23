@@ -1,0 +1,86 @@
+﻿# Console Chess
+
+A console-based implementation of the game Chess using Java.
+
+## Features
+
+- Complete chess board with all pieces in starting positions
+- Two-player gameplay with turn-based moves
+- Move validation according to chess rules
+- Console-based user interface
+- Standard algebraic notation for moves (e.g., "e2e4")
+- Input validation and error handling
+
+## Requirements
+
+- Java 11 or higher
+- Maven 3.6 or higher
+
+## How to Run
+
+### Using Maven
+```bash
+mvn compile exec:java
+```
+
+### Using Java directly
+```bash
+# Compile the project
+mvn compile
+
+# Run the main class
+java -cp target/classes com.consolechess.ChessGame
+```
+
+## How to Play
+
+1. Run the program
+2. Enter player names when prompted
+3. Enter moves using standard algebraic notation:
+   - Format: `fromSquare toSquare` (e.g., `e2e4`)
+   - Squares are denoted as `a1` to `h8`
+4. Type `quit` or `q` to exit
+5. Type `help` for available commands
+
+## Project Structure
+
+```
+src/
+ main/java/com/consolechess/
+    ChessGame.java      # Main game class
+    Board.java          # Chess board logic
+    Piece.java          # Chess piece representation
+    Position.java       # Board position
+    Player.java         # Player representation
+    PieceType.java      # Piece types enum
+    PieceColor.java     # Piece colors enum
+ test/java/com/consolechess/
+     BoardTest.java      # Board unit tests
+     PieceTest.java      # Piece unit tests
+     PositionTest.java   # Position unit tests
+```
+
+## Testing
+
+Run the unit tests using Maven:
+```bash
+mvn test
+```
+
+## Implementation Details
+
+This implementation includes:
+- Object-oriented design with proper separation of concerns
+- Move validation for all chess pieces
+- Clean console interface
+- Comprehensive unit tests
+- Maven project structure
+
+## Future Enhancements
+
+- Check and checkmate detection
+- Castling implementation
+- En passant capture
+- Pawn promotion
+- Stalemate detection
+- Game history and undo functionality
