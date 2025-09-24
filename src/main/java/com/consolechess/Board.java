@@ -320,22 +320,22 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("   a   b   c   d   e   f   g   h\n");
+        sb.append("  a  b  c  d  e  f  g  h\n");
         
         for (int row = 0; row < BOARD_SIZE; row++) {
             sb.append(8 - row).append(" ");
             for (int col = 0; col < BOARD_SIZE; col++) {
                 Piece piece = squares[row][col];
                 if (piece != null) {
-                    sb.append(piece.toString()).append(" ");
+                    sb.append(piece.toString()).append("  ");
                 } else {
-                    sb.append(" . ").append(" ");  // Centered empty square
+                    sb.append(".  ");  // Empty square
                 }
             }
             sb.append(8 - row).append("\n");
         }
         
-        sb.append("   a   b   c   d   e   f   g   h\n");
+        sb.append("  a  b  c  d  e  f  g  h\n");
         return sb.toString();
     }
 }

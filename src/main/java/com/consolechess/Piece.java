@@ -28,39 +28,39 @@ public class Piece {
     }
     
     /**
-     * Returns simple letter-based coin representation for pieces.
-     * White pieces: Capital letters in square brackets  
-     * Black pieces: Lowercase letters in curved brackets
+     * Returns chess symbols for pieces.
+     * White pieces: Unicode U+2654-U+2659 (filled symbols)
+     * Black pieces: Unicode U+265A-U+265F (filled symbols)
      */
-    private String getCoinSymbol() {
+    private String getChessSymbol() {
         if (color == PieceColor.WHITE) {
-            // White pieces with capital letters
+            // White pieces with ASCII symbols
             switch (type) {
-                case KING: return "[K]";         // White King
-                case QUEEN: return "[Q]";        // White Queen  
-                case ROOK: return "[R]";         // White Rook
-                case BISHOP: return "[B]";       // White Bishop
-                case KNIGHT: return "[N]";       // White Knight
-                case PAWN: return "[P]";         // White Pawn
-                default: return "[?]";
+                case KING: return "♔";     // King symbol
+                case QUEEN: return "♕";    // Queen symbol  
+                case ROOK: return "♖";     // Rook symbol
+                case BISHOP: return "♗";   // Bishop symbol
+                case KNIGHT: return "♘";   // Knight symbol
+                case PAWN: return "♙";     // Pawn symbol
+                default: return "?";
             }
         } else { // BLACK  
-            // Black pieces with lowercase letters
+            // Black pieces with different ASCII symbols
             switch (type) {
-                case KING: return "(k)";         // Black King
-                case QUEEN: return "(q)";        // Black Queen
-                case ROOK: return "(r)";         // Black Rook
-                case BISHOP: return "(b)";       // Black Bishop
-                case KNIGHT: return "(n)";       // Black Knight
-                case PAWN: return "(p)";         // Black Pawn
-                default: return "(?)";
+                case KING: return "♚";     // Black King
+                case QUEEN: return "♛";    // Black Queen
+                case ROOK: return "♜";     // Black Rook
+                case BISHOP: return "♝";   // Black Bishop
+                case KNIGHT: return "♞";   // Black Knight
+                case PAWN: return "♟";     // Black Pawn
+                default: return "?";
             }
         }
     }
     
     @Override
     public String toString() {
-        String symbol = getCoinSymbol();
+        String symbol = getChessSymbol();
         if (!USE_COLORS) {
             return symbol;
         }
