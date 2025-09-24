@@ -8,14 +8,11 @@ public class Piece {
     private final PieceColor color;
     // ANSI color codes for nicer terminal rendering
     private static final String ANSI_RESET = "\u001B[0m";
-    private static final String ANSI_BRIGHT_WHITE = "\u001B[97m";
     private static final String ANSI_BRIGHT_CYAN = "\u001B[96m";
     private static final String ANSI_YELLOW = "\u001B[93m";
-    private static final String ANSI_BLUE = "\u001B[94m";
     
     // Configuration options
     private static final boolean USE_COLORS = true;
-    private static final boolean USE_UNICODE_SYMBOLS = false;  // Terminal doesn't support Unicode, use letters
     
     public Piece(PieceType type, PieceColor color) {
         this.type = type;
@@ -63,7 +60,7 @@ public class Piece {
     
     @Override
     public String toString() {
-        String symbol = getCoinSymbol();  // Use coin/symbol style
+        String symbol = getCoinSymbol();
         if (!USE_COLORS) {
             return symbol;
         }
