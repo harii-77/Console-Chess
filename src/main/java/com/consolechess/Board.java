@@ -320,7 +320,7 @@ public class Board {
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("  a b c d e f g h\n");
+        sb.append("   a   b   c   d   e   f   g   h\n");
         
         for (int row = 0; row < BOARD_SIZE; row++) {
             sb.append(8 - row).append(" ");
@@ -329,13 +329,13 @@ public class Board {
                 if (piece != null) {
                     sb.append(piece.toString()).append(" ");
                 } else {
-                    sb.append(". ");
+                    sb.append(" . ").append(" ");  // Centered empty square
                 }
             }
             sb.append(8 - row).append("\n");
         }
         
-        sb.append("  a b c d e f g h\n");
+        sb.append("   a   b   c   d   e   f   g   h\n");
         return sb.toString();
     }
 }
