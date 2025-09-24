@@ -10,8 +10,12 @@ public class Piece {
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BRIGHT_WHITE = "\u001B[97m";
     private static final String ANSI_BRIGHT_CYAN = "\u001B[96m";
-    // Toggle to disable colors if your terminal doesn't support ANSI
+    private static final String ANSI_YELLOW = "\u001B[93m";
+    private static final String ANSI_BLUE = "\u001B[94m";
+    
+    // Configuration options
     private static final boolean USE_COLORS = true;
+    private static final boolean USE_UNICODE_SYMBOLS = false;  // Terminal doesn't support Unicode, use letters
     
     public Piece(PieceType type, PieceColor color) {
         this.type = type;
@@ -26,16 +30,46 @@ public class Piece {
         return color;
     }
     
+    /**
+     * Returns simple letter-based coin representation for pieces.
+     * White pieces: Capital letters in square brackets  
+     * Black pieces: Lowercase letters in curved brackets
+     */
+    private String getCoinSymbol() {
+        if (color == PieceColor.WHITE) {
+            // White pieces with capital letters
+            switch (type) {
+                case KING: return "[K]";         // White King
+                case QUEEN: return "[Q]";        // White Queen  
+                case ROOK: return "[R]";         // White Rook
+                case BISHOP: return "[B]";       // White Bishop
+                case KNIGHT: return "[N]";       // White Knight
+                case PAWN: return "[P]";         // White Pawn
+                default: return "[?]";
+            }
+        } else { // BLACK  
+            // Black pieces with lowercase letters
+            switch (type) {
+                case KING: return "(k)";         // Black King
+                case QUEEN: return "(q)";        // Black Queen
+                case ROOK: return "(r)";         // Black Rook
+                case BISHOP: return "(b)";       // Black Bishop
+                case KNIGHT: return "(n)";       // Black Knight
+                case PAWN: return "(p)";         // Black Pawn
+                default: return "(?)";
+            }
+        }
+    }
+    
     @Override
     public String toString() {
-        String symbol = type.toString();
-        String rendered = color == PieceColor.WHITE ? symbol : symbol.toLowerCase();
+        String symbol = getCoinSymbol();  // Use coin/symbol style
         if (!USE_COLORS) {
-            return rendered;
+            return symbol;
         }
-        // White pieces in bright white, black pieces in bright cyan
-        String colorCode = (color == PieceColor.WHITE) ? ANSI_BRIGHT_WHITE : ANSI_BRIGHT_CYAN;
-        return colorCode + rendered + ANSI_RESET;
+        // White pieces in bright yellow, black pieces in bright cyan for contrast
+        String colorCode = (color == PieceColor.WHITE) ? ANSI_YELLOW : ANSI_BRIGHT_CYAN;
+        return colorCode + symbol + ANSI_RESET;
     }
     
     @Override
