@@ -200,7 +200,3 @@ Example log files:
 - If Java version is too new/old, use JDK 11+.
 - **Log file warnings**: Fixed in latest version with proper resource management.
 - **Display issues**: Latest version includes enhanced piece formatting and spacing.
-
-## License
-
-MIT (or your preferred license). Update this section if you choose a different license.
