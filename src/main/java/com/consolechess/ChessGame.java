@@ -1,6 +1,10 @@
 package com.consolechess;
 
 import java.util.Scanner;
+import java.util.List;
+import java.io.*;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Main class for the Console Chess game.
@@ -15,6 +19,9 @@ public class ChessGame {
     private boolean gameRunning;
     private boolean gameEnded;
     private MoveLogger moveLogger;
+    
+    // Save directory for game files
+    private static final String SAVE_DIR = "saves";
 
     public ChessGame() {
         this.board = new Board();
@@ -22,6 +29,13 @@ public class ChessGame {
         this.gameRunning = true;
         this.gameEnded = false;
         this.moveLogger = new MoveLogger();
+        
+        // Create saves directory if it doesn't exist
+        try {
+            Files.createDirectories(Paths.get(SAVE_DIR));
+        } catch (IOException e) {
+            System.err.println("Warning: Could not create saves directory.");
+        }
     }
 
     /**
@@ -56,13 +70,19 @@ public class ChessGame {
         // Log game start
         moveLogger.logGameStart(whitePlayer.getName(), blackPlayer.getName());
         
-        System.out.println("\nGame initialized!");
+        System.out.println("\n*** Game initialized with advanced features! ***");
         System.out.println("White: " + whitePlayer.getName());
         System.out.println("Black: " + blackPlayer.getName());
+        System.out.println("\n>> Features available:");
+        System.out.println("+ Castling (O-O, O-O-O)    + En passant capture");
+        System.out.println("+ Pawn promotion            + Check/Checkmate detection");
+        System.out.println("+ Move validation           + Save/Load games");
+        System.out.println("+ Valid moves list (pip)    + Complete move logging");
         System.out.println("\nCommands:");
-        System.out.println("- Enter moves in format: e2e4 (from square to square)");
+        System.out.println("- Enter moves: e2e4 (from square to square)");
+        System.out.println("- Type 'pip' to see all valid moves");
+        System.out.println("- Type 'help' for full command list");
         System.out.println("- Type 'quit' or 'q' to exit");
-        System.out.println("- Type 'help' for more commands");
     }
 
     /**
@@ -128,6 +148,34 @@ public class ChessGame {
             return;
         }
         
+        if (input.equals("pip")) {
+            displayValidMoves();
+            return;
+        }
+        
+        if (input.startsWith("save ")) {
+            String filename = input.substring(5).trim();
+            saveGame(filename);
+            return;
+        }
+        
+        if (input.startsWith("load ")) {
+            String filename = input.substring(5).trim();
+            loadGame(filename);
+            return;
+        }
+        
+        // Handle special castling notation
+        if (input.equals("o-o") || input.equals("0-0")) {
+            handleCastling(true); // Kingside
+            return;
+        }
+        
+        if (input.equals("o-o-o") || input.equals("0-0-0")) {
+            handleCastling(false); // Queenside
+            return;
+        }
+        
         if (input.length() == 4) {
             // Try to parse as a move (e.g., "e2e4")
             try {
@@ -156,11 +204,30 @@ public class ChessGame {
      * Display help information.
      */
     private void displayHelp() {
-        System.out.println("\nAvailable commands:");
-        System.out.println("- Move: e2e4 (from square to square)");
-        System.out.println("- Quit: quit or q");
-        System.out.println("- Help: help");
-        System.out.println("\nSquare notation: a1 to h8");
+        System.out.println("\n=== AVAILABLE COMMANDS ===");
+        System.out.println(">> Game Commands:");
+        System.out.println("  help           - Show this help message");
+        System.out.println("  quit or q      - Exit the game");
+        System.out.println();
+        System.out.println(">> Movement Commands:");
+        System.out.println("  e2e4           - Move piece from e2 to e4 (standard notation)");
+        System.out.println("  O-O or 0-0     - Kingside castling");
+        System.out.println("  O-O-O or 0-0-0 - Queenside castling");
+        System.out.println();
+        System.out.println(">> Information Commands:");
+        System.out.println("  pip            - Show all valid moves for current player");
+        System.out.println();
+        System.out.println(">> File Commands:");
+        System.out.println("  save <name>    - Save current game (e.g., 'save mygame')");
+        System.out.println("  load <name>    - Load saved game (e.g., 'load mygame')");
+        System.out.println();
+        System.out.println(">> Notes:");
+        System.out.println("  * Square notation: a1 to h8 (files a-h, ranks 1-8)");
+        System.out.println("  * White pieces: [P] [R] [N] [B] [Q] [K]");
+        System.out.println("  * Black pieces: (p) (r) (n) (b) (q) (k)");
+        System.out.println("  * Special moves: castling, en passant, pawn promotion");
+        System.out.println("  * All moves and events are logged automatically");
+        System.out.println("===========================");
     }
 
     /**
@@ -281,5 +348,143 @@ public class ChessGame {
         int rankNum = square.charAt(1) - '0'; // ranks 1-8
         int row = 8 - rankNum; // rank 1 -> row 7 (bottom), rank 8 -> row 0 (top)
         return new Position(row, file);
+    }
+
+    /**
+     * Display all valid moves for the current player (pip command).
+     */
+    private void displayValidMoves() {
+        List<String> validMoves = board.getAllValidMoves(currentPlayer.getColor());
+        
+        if (validMoves.isEmpty()) {
+            System.out.println("No valid moves available for " + currentPlayer.getName());
+        } else {
+            System.out.println("\nValid moves for " + currentPlayer.getName() + " (" + currentPlayer.getColor() + "):");
+            int count = 0;
+            for (String move : validMoves) {
+                System.out.print(move + "  ");
+                count++;
+                if (count % 4 == 0) { // Display 4 moves per line
+                    System.out.println();
+                }
+            }
+            if (count % 4 != 0) {
+                System.out.println();
+            }
+            System.out.println("Total moves: " + validMoves.size());
+        }
+    }
+    
+    /**
+     * Save the current game state to a file.
+     */
+    private void saveGame(String filename) {
+        if (filename.isEmpty()) {
+            System.out.println("Please provide a filename. Usage: save <filename>");
+            return;
+        }
+        
+        try {
+            // Add .sav extension if not present
+            if (!filename.endsWith(".sav")) {
+                filename += ".sav";
+            }
+            
+            String filepath = SAVE_DIR + "/" + filename;
+            String gameState = board.saveGameState();
+            
+            // Add player information
+            StringBuilder fullSave = new StringBuilder();
+            fullSave.append("PLAYERS:").append(whitePlayer.getName()).append(",").append(blackPlayer.getName()).append("\n");
+            fullSave.append("CURRENT:").append(currentPlayer.getColor()).append("\n");
+            fullSave.append(gameState);
+            
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
+                writer.write(fullSave.toString());
+            }
+            
+            System.out.println("Game saved to " + filepath);
+            moveLogger.logEvent("Game saved to " + filename);
+            
+        } catch (IOException e) {
+            System.out.println("Error saving game: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Load a game state from a file.
+     */
+    private void loadGame(String filename) {
+        if (filename.isEmpty()) {
+            System.out.println("Please provide a filename. Usage: load <filename>");
+            return;
+        }
+        
+        try {
+            // Add .sav extension if not present
+            if (!filename.endsWith(".sav")) {
+                filename += ".sav";
+            }
+            
+            String filepath = SAVE_DIR + "/" + filename;
+            
+            if (!Files.exists(Paths.get(filepath))) {
+                System.out.println("Save file not found: " + filename);
+                return;
+            }
+            
+            String gameState = Files.readString(Paths.get(filepath));
+            
+            // Parse player information
+            String[] lines = gameState.split("\n");
+            for (String line : lines) {
+                if (line.startsWith("PLAYERS:")) {
+                    String[] playerNames = line.substring(8).split(",");
+                    whitePlayer = new Player(playerNames[0], PieceColor.WHITE);
+                    blackPlayer = new Player(playerNames[1], PieceColor.BLACK);
+                } else if (line.startsWith("CURRENT:")) {
+                    PieceColor currentColor = PieceColor.valueOf(line.substring(8));
+                    currentPlayer = (currentColor == PieceColor.WHITE) ? whitePlayer : blackPlayer;
+                }
+            }
+            
+            // Load board state
+            if (board.loadGameState(gameState)) {
+                System.out.println("Game loaded successfully from " + filepath);
+                System.out.println("White: " + whitePlayer.getName());
+                System.out.println("Black: " + blackPlayer.getName());
+                System.out.println("Current player: " + currentPlayer.getName() + " (" + currentPlayer.getColor() + ")");
+                moveLogger.logEvent("Game loaded from " + filename);
+            } else {
+                System.out.println("Error: Invalid save file format.");
+            }
+            
+        } catch (IOException e) {
+            System.out.println("Error loading game: " + e.getMessage());
+        }
+    }
+    
+    /**
+     * Handle castling notation (O-O or O-O-O).
+     */
+    private void handleCastling(boolean kingside) {
+        int row = currentPlayer.getColor() == PieceColor.WHITE ? 7 : 0;
+        Position kingPos = new Position(row, 4);
+        Position kingDestPos = new Position(row, kingside ? 6 : 2);
+        
+        if (makeMove(kingPos, kingDestPos, 
+                     positionToNotation(kingPos), 
+                     positionToNotation(kingDestPos))) {
+            switchPlayer();
+        }
+    }
+    
+    /**
+     * Convert position to notation for castling handler.
+     */
+    private String positionToNotation(Position pos) {
+        char file = (char) ('a' + pos.getColumn());
+        int rank = 8 - pos.getRow();
+        return "" + file + rank;
     }
 }
