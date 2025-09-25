@@ -13,11 +13,13 @@ public class ChessGame {
     private Player currentPlayer;
     private Scanner scanner;
     private boolean gameRunning;
+    private MoveLogger moveLogger;
 
     public ChessGame() {
         this.board = new Board();
         this.scanner = new Scanner(System.in);
         this.gameRunning = true;
+        this.moveLogger = new MoveLogger();
     }
 
     /**
@@ -49,6 +51,9 @@ public class ChessGame {
         this.blackPlayer = new Player(blackName, PieceColor.BLACK);
         this.currentPlayer = whitePlayer; // White always starts
         
+        // Log game start
+        moveLogger.logGameStart(whitePlayer.getName(), blackPlayer.getName());
+        
         System.out.println("\nGame initialized!");
         System.out.println("White: " + whitePlayer.getName());
         System.out.println("Black: " + blackPlayer.getName());
@@ -74,6 +79,8 @@ public class ChessGame {
             processInput(input);
         }
         
+        // Log game end
+        moveLogger.logGameEnd("Game completed");
         scanner.close();
         System.out.println("Thanks for playing!");
     }
@@ -106,6 +113,7 @@ public class ChessGame {
      */
     private void processInput(String input) {
         if (input.equals("quit") || input.equals("q")) {
+            moveLogger.logGameEnd("Game quit by player");
             gameRunning = false;
             return;
         }
@@ -125,7 +133,7 @@ public class ChessGame {
                     Position fromPos = parsePosition(from);
                     Position toPos = parsePosition(to);
                     
-                    if (makeMove(fromPos, toPos)) {
+                    if (makeMove(fromPos, toPos, from, to)) {
                         switchPlayer();
                     }
                 } else {
@@ -161,25 +169,42 @@ public class ChessGame {
     /**
      * Attempt to make a move on the board.
      */
-    private boolean makeMove(Position from, Position to) {
+    private boolean makeMove(Position from, Position to, String fromSquare, String toSquare) {
         if (board.isValidMove(from, to, currentPlayer.getColor())) {
+            // Get piece information before making the move
+            Piece movingPiece = board.getPiece(from);
+            Piece capturedPiece = board.getPiece(to);
+            boolean isCapture = (capturedPiece != null);
+            
+            // Make the move
             board.makeMove(from, to);
             System.out.println("Move successful!");
+            
+            // Log the move
+            moveLogger.logMove(currentPlayer.getName(), currentPlayer.getColor(), 
+                             fromSquare, toSquare, movingPiece.getType().toString(), isCapture);
+            
             // Handle pawn promotion if applicable
-            handlePromotionIfNeeded(to);
+            handlePromotionIfNeeded(to, toSquare);
+            
             // Announce check if the opponent's king is in check after this move
             Player opponent = (currentPlayer == whitePlayer) ? blackPlayer : whitePlayer;
             if (board.isInCheck(opponent.getColor())) {
                 System.out.println("Check!");
+                moveLogger.logCheck(opponent.getName(), opponent.getColor());
+                
                 // Checkmate detection: opponent is in check and has no legal move
                 if (!board.hasAnyLegalMove(opponent.getColor())) {
                     System.out.println("Checkmate! Winner: " + currentPlayer.getName());
+                    moveLogger.logCheckmate(currentPlayer.getName(), currentPlayer.getColor(),
+                                          opponent.getName(), opponent.getColor());
                     gameRunning = false;
                 }
             } else {
                 // Stalemate detection: not in check and no legal moves
                 if (!board.hasAnyLegalMove(opponent.getColor())) {
                     System.out.println("Stalemate! The game is a draw.");
+                    moveLogger.logStalemate();
                     gameRunning = false;
                 }
             }
@@ -193,7 +218,7 @@ public class ChessGame {
     /**
      * If the moved piece is a pawn that reached the back rank, prompt for promotion.
      */
-    private void handlePromotionIfNeeded(Position to) {
+    private void handlePromotionIfNeeded(Position to, String square) {
         Piece moved = board.getPiece(to);
         if (moved == null || moved.getType() != PieceType.PAWN) {
             return;
@@ -214,6 +239,10 @@ public class ChessGame {
             if (promoteTo != null) {
                 board.setPiece(to, new Piece(promoteTo, moved.getColor()));
                 System.out.println("Pawn promoted to " + promoteTo + "!");
+                
+                // Log the promotion
+                moveLogger.logPromotion(currentPlayer.getName(), currentPlayer.getColor(),
+                                      square, promoteTo);
                 break;
             }
             System.out.println("Invalid choice. Enter Q, R, B, or N.");
