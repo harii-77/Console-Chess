@@ -13,12 +13,14 @@ public class ChessGame {
     private Player currentPlayer;
     private Scanner scanner;
     private boolean gameRunning;
+    private boolean gameEnded;
     private MoveLogger moveLogger;
 
     public ChessGame() {
         this.board = new Board();
         this.scanner = new Scanner(System.in);
         this.gameRunning = true;
+        this.gameEnded = false;
         this.moveLogger = new MoveLogger();
     }
 
@@ -79,8 +81,10 @@ public class ChessGame {
             processInput(input);
         }
         
-        // Log game end
-        moveLogger.logGameEnd("Game completed");
+        // Log game end only if not already logged
+        if (!gameEnded) {
+            moveLogger.logGameEnd("Game completed");
+        }
         scanner.close();
         System.out.println("Thanks for playing!");
     }
@@ -115,6 +119,7 @@ public class ChessGame {
         if (input.equals("quit") || input.equals("q")) {
             moveLogger.logGameEnd("Game quit by player");
             gameRunning = false;
+            gameEnded = true;
             return;
         }
         
@@ -199,6 +204,7 @@ public class ChessGame {
                     moveLogger.logCheckmate(currentPlayer.getName(), currentPlayer.getColor(),
                                           opponent.getName(), opponent.getColor());
                     gameRunning = false;
+                    gameEnded = true;
                 }
             } else {
                 // Stalemate detection: not in check and no legal moves
@@ -206,6 +212,7 @@ public class ChessGame {
                     System.out.println("Stalemate! The game is a draw.");
                     moveLogger.logStalemate();
                     gameRunning = false;
+                    gameEnded = true;
                 }
             }
             return true;
