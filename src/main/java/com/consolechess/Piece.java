@@ -29,31 +29,31 @@ public class Piece {
     
     /**
      * Returns chess symbols for pieces.
-     * White pieces: Unicode U+2654-U+2659 (filled symbols)
-     * Black pieces: Unicode U+265A-U+265F (filled symbols)
+     * White pieces: [P] [R] [N] [B] [Q] [K] (uppercase in brackets)
+     * Black pieces: (p) (r) (n) (b) (q) (k) (lowercase in parentheses)
      */
     private String getChessSymbol() {
         if (color == PieceColor.WHITE) {
-            // White pieces with Unicode escape sequences
+            // White pieces with brackets and uppercase letters
             switch (type) {
-                case KING: return "\u2654";     // White King
-                case QUEEN: return "\u2655";    // White Queen  
-                case ROOK: return "\u2656";     // White Rook
-                case BISHOP: return "\u2657";   // White Bishop
-                case KNIGHT: return "\u2658";   // White Knight
-                case PAWN: return "\u2659";     // White Pawn
-                default: return "?";
+                case KING: return "[K]";     // White King
+                case QUEEN: return "[Q]";    // White Queen  
+                case ROOK: return "[R]";     // White Rook
+                case BISHOP: return "[B]";   // White Bishop
+                case KNIGHT: return "[N]";   // White Knight
+                case PAWN: return "[P]";     // White Pawn
+                default: return "[?]";
             }
         } else { // BLACK  
-            // Black pieces with Unicode escape sequences
+            // Black pieces with parentheses and lowercase letters
             switch (type) {
-                case KING: return "\u265A";     // Black King
-                case QUEEN: return "\u265B";    // Black Queen
-                case ROOK: return "\u265C";     // Black Rook
-                case BISHOP: return "\u265D";   // Black Bishop
-                case KNIGHT: return "\u265E";   // Black Knight
-                case PAWN: return "\u265F";     // Black Pawn
-                default: return "?";
+                case KING: return "(k)";     // Black King
+                case QUEEN: return "(q)";    // Black Queen
+                case ROOK: return "(r)";     // Black Rook
+                case BISHOP: return "(b)";   // Black Bishop
+                case KNIGHT: return "(n)";   // Black Knight
+                case PAWN: return "(p)";     // Black Pawn
+                default: return "(?)";
             }
         }
     }
