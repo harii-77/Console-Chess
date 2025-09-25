@@ -5,6 +5,8 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 
 /**
  * Logger class to track all moves and game events in the chess game.
@@ -15,11 +17,13 @@ public class MoveLogger {
     private SimpleDateFormat dateFormat;
     private int moveNumber;
     private boolean isWhiteTurn;
+    private boolean isClosed;
     
     public MoveLogger() {
         this.dateFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
         this.moveNumber = 1;
         this.isWhiteTurn = true;
+        this.isClosed = false;
         initializeLogFile();
         
         // Add shutdown hook to ensure log file is closed properly
@@ -31,8 +35,11 @@ public class MoveLogger {
      */
     private void initializeLogFile() {
         try {
+            // Create logs directory if it doesn't exist
+            Files.createDirectories(Paths.get("logs"));
+            
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
-            String fileName = "chess_game_" + timestamp + ".log";
+            String fileName = "logs/chess_game_" + timestamp + ".log";
             logWriter = new BufferedWriter(new FileWriter(fileName));
             logToFile("=== CHESS GAME LOG STARTED ===");
         } catch (IOException e) {
@@ -117,9 +124,11 @@ public class MoveLogger {
      * Log the end of the game.
      */
     public void logGameEnd(String result) {
-        logEvent("Game ended: " + result);
-        logEvent("=== CHESS GAME LOG ENDED ===");
-        closeLogFile();
+        if (!isClosed) {
+            logEvent("Game ended: " + result);
+            logEvent("=== CHESS GAME LOG ENDED ===");
+            closeLogFile();
+        }
     }
     
     /**
@@ -140,7 +149,7 @@ public class MoveLogger {
      * Write a message to the log file.
      */
     private void logToFile(String message) {
-        if (logWriter != null) {
+        if (logWriter != null && !isClosed) {
             try {
                 logWriter.write(message);
                 logWriter.newLine();
@@ -155,9 +164,11 @@ public class MoveLogger {
      * Close the log file properly.
      */
     private void closeLogFile() {
-        if (logWriter != null) {
+        if (logWriter != null && !isClosed) {
             try {
+                isClosed = true;
                 logWriter.close();
+                logWriter = null;
             } catch (IOException e) {
                 System.err.println("Warning: Failed to close log file: " + e.getMessage());
             }
