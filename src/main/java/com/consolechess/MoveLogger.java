@@ -134,7 +134,7 @@ public class MoveLogger {
     /**
      * Log a general game event.
      */
-    private void logEvent(String message) {
+    public void logEvent(String message) {
         String timestamp = dateFormat.format(new Date());
         String logMessage = String.format("[%s] %s", timestamp, message);
         
