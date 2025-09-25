@@ -34,25 +34,25 @@ public class Piece {
      */
     private String getChessSymbol() {
         if (color == PieceColor.WHITE) {
-            // White pieces with ASCII symbols
+            // White pieces with Unicode escape sequences
             switch (type) {
-                case KING: return "♔";     // King symbol
-                case QUEEN: return "♕";    // Queen symbol  
-                case ROOK: return "♖";     // Rook symbol
-                case BISHOP: return "♗";   // Bishop symbol
-                case KNIGHT: return "♘";   // Knight symbol
-                case PAWN: return "♙";     // Pawn symbol
+                case KING: return "\u2654";     // White King
+                case QUEEN: return "\u2655";    // White Queen  
+                case ROOK: return "\u2656";     // White Rook
+                case BISHOP: return "\u2657";   // White Bishop
+                case KNIGHT: return "\u2658";   // White Knight
+                case PAWN: return "\u2659";     // White Pawn
                 default: return "?";
             }
         } else { // BLACK  
-            // Black pieces with different ASCII symbols
+            // Black pieces with Unicode escape sequences
             switch (type) {
-                case KING: return "♚";     // Black King
-                case QUEEN: return "♛";    // Black Queen
-                case ROOK: return "♜";     // Black Rook
-                case BISHOP: return "♝";   // Black Bishop
-                case KNIGHT: return "♞";   // Black Knight
-                case PAWN: return "♟";     // Black Pawn
+                case KING: return "\u265A";     // Black King
+                case QUEEN: return "\u265B";    // Black Queen
+                case ROOK: return "\u265C";     // Black Rook
+                case BISHOP: return "\u265D";   // Black Bishop
+                case KNIGHT: return "\u265E";   // Black Knight
+                case PAWN: return "\u265F";     // Black Pawn
                 default: return "?";
             }
         }
