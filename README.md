@@ -1,6 +1,6 @@
 ﻿# Console Chess
 
-A clean, console-based two-player chess game written in Java with comprehensive logging and modern display formatting.
+A clean, console-based two-player chess game written in Java with comprehensive logging, advanced chess rules, and modern display formatting.
 
 ## Features
 
@@ -11,17 +11,43 @@ A clean, console-based two-player chess game written in Java with comprehensive 
 - Legal move validation (includes path blocking for sliders)
 - King safety: moves that leave your king in check are rejected
 - Check, checkmate, and stalemate detection with messages
-- Pawn promotion (Q/R/B/N) when reaching the back rank
 - Simple console UI with friendly prompts and input validation
 
-### New Features ✨
+### Advanced Chess Rules ✨
 
+- **Castling**: Both kingside (O-O) and queenside (O-O-O) castling
+  - Automatic validation of castling conditions (king/rook not moved, path clear, not in check)
+  - Special notation support: `O-O`, `0-0`, `O-O-O`, `0-0-0`
+- **En Passant**: Automatic pawn capture when opponent's pawn moves two squares
+  - Proper timing validation (must be captured immediately)
+  - Automatic removal of captured pawn
+- **Pawn Promotion**: Interactive promotion when pawn reaches back rank
+  - Choose from Queen, Rook, Bishop, or Knight
+  - Logged with special notation
+- **Complete Move Validation**: All chess rules properly implemented
+  - Prevents moves that would put own king in check
+  - Validates piece-specific movement patterns
+
+### Enhanced Game Features ✨
+
+- **Move Analysis System**:
+  - `pip` command shows all valid moves for current player
+  - Move categorization (captures, castling, en passant, etc.)
+  - Move counting and organization
+- **Save/Load Game State**: Full game persistence
+  - Save games with custom filenames: `save mygame`
+  - Load previous games: `load mygame`
+  - Preserves board state, castling rights, en passant status, move history
+  - Automatic `.sav` file extension handling
 - **Comprehensive Move Logging**: All game events logged with timestamps
   - Game start/end logging with player names
   - Move notation in proper chess format (1. e2e4, 1... e7e5)
-  - Capture detection and logging
+  - Capture detection and special move logging (castling, en passant)
   - Special events: check, checkmate, stalemate, pawn promotions
   - Automatic log file creation with timestamps
+
+### Visual & UI Features
+
 - **Enhanced Visual Display**:
   - White pieces: `[P] [R] [N] [B] [Q] [K]` (uppercase in brackets)
   - Black pieces: `(p) (r) (n) (b) (q) (k)` (lowercase in parentheses)
@@ -32,6 +58,7 @@ A clean, console-based two-player chess game written in Java with comprehensive 
   - Timestamped log files: `chess_game_YYYYMMDD_HHMMSS.log`
   - Dual logging: console output and persistent file storage
   - Automatic cleanup and resource management
+- **Advanced Help System**: Comprehensive command reference with categories
 
 ## Prerequisites
 
@@ -85,7 +112,7 @@ This compiles with `javac` and runs the game without Maven.
 java -jar console-chess-1.0.0.jar
 ```
 
-The JAR includes all latest features and improvements.
+The JAR includes all latest advanced features and improvements.
 
 ### Option 5: Manual compile and run on Windows (no Maven)
 
@@ -107,14 +134,18 @@ java -cp target/classes com.consolechess.ChessGame
 1. Start the program and enter player names when prompted.
 2. Enter moves in coordinate notation: `e2e4` means from `e2` to `e4`.
    - Files: `a` to `h`, Ranks: `1` to `8`.
-3. Commands:
-   - `help`: show usage
-   - `quit` or `q`: exit (properly logged)
-4. Special rules implemented:
-   - Check: after a move, if the opponent is in check, you'll see "Check!".
-   - Checkmate: if the opponent has no legal moves while in check, the winner is announced and the game ends.
-   - Stalemate: if the opponent has no legal moves and is not in check, the game is a draw.
-   - Pawn promotion: when a pawn reaches the last rank, choose `Q`, `R`, `B`, or `N`.
+3. **Available Commands**:
+
+   - **Movement**: `e2e4` (standard notation), `O-O` (kingside castling), `O-O-O` (queenside castling)
+   - **Information**: `pip` (show all valid moves), `help` (show all commands)
+   - **Game Control**: `quit` or `q` (exit game)
+   - **File Operations**: `save <name>` (save game), `load <name>` (load game)
+
+4. **Advanced Rules Implemented**:
+   - **Castling**: Use `O-O` for kingside or `O-O-O` for queenside castling
+   - **En Passant**: Automatic - just move your pawn diagonally to capture
+   - **Pawn Promotion**: When pawn reaches end, choose `Q`, `R`, `B`, or `N`
+   - **Check/Checkmate/Stalemate**: Automatically detected and announced
 
 ### Game Display
 
@@ -123,28 +154,60 @@ java -cp target/classes com.consolechess.ChessGame
 - **Empty squares**: `.` with proper spacing alignment
 - **Move logging**: All moves logged to console and `logs/chess_game_TIMESTAMP.log`
 
+### Advanced Command Examples
+
+#### Valid Moves Display (pip command)
+
+```
+Enter your move: pip
+Valid moves for Alice (WHITE):
+a2a3  a2a4  b1a3  b1c3  b2b3  b2b4
+c2c3  c2c4  d2d3  d2d4  e2e3  e2e4
+f2f3  f2f4  g1f3  g1h3  g2g3  g2g4
+h2h3  h2h4
+Total moves: 20
+```
+
+#### Castling Examples
+
+```
+Enter your move: O-O          # Kingside castling
+Enter your move: O-O-O        # Queenside castling
+```
+
+#### Save/Load Examples
+
+```
+Enter your move: save mygame    # Saves to saves/mygame.sav
+Enter your move: load mygame    # Loads from saves/mygame.sav
+```
+
 ### Sample Log Output
 
 ```
 [2025-09-25 09:16:43] Game started - White: Alice, Black: Bob
 [2025-09-25 09:16:48] 1. Alice: e2e4 (P)
 [2025-09-25 09:16:52] 1... Bob: e7e5 (P)
-[2025-09-25 09:16:55] 2. Alice: d1h5 (Q)
-[2025-09-25 09:16:58] 2... Bob: b8c6 (N)
+[2025-09-25 09:17:10] 2. Alice: O-O
+[2025-09-25 09:17:15] 2... Bob: d7d6 (P)
+[2025-09-25 09:17:25] Alice (WHITE) promoted pawn at d8 to QUEEN
+[2025-09-25 09:17:30] Bob (BLACK) is in CHECK!
+[2025-09-25 09:17:35] CHECKMATE! Alice (WHITE) defeats Bob (BLACK)
 ```
 
 ### Quick demo sequences
 
-- Scholar's Mate (White wins):
-  - White: `e2e4`, Black: `e7e5`, White: `d1h5`, Black: `b8c6`, White: `f1c4`, Black: `g7g6`, White: `h5f7`
+- **Scholar's Mate** (White wins): `e2e4`, `e7e5`, `d1h5`, `b8c6`, `f1c4`, `g7g6`, `h5f7`
+- **Castling Demo**: `e2e4`, `e7e5`, `g1f3`, `b8c6`, `f1c4`, `f8c5`, `O-O`
+- **En Passant Setup**: `e2e4`, `d7d5`, `e4d5`, `c7c5`, `d5d6` (en passant)
 
 ## Project Structure
 
 ```
 src/
   main/java/com/consolechess/
-    ChessGame.java     # Game loop and CLI with logging integration
-    Board.java         # Board state and validation (including check logic)
+    ChessGame.java     # Game loop and CLI with advanced command processing
+    Board.java         # Board state with castling, en passant, save/load ✨
     MoveLogger.java    # Comprehensive game event logging system ✨
     Piece.java         # Piece model with enhanced display formatting
     Position.java      # Coordinate model
@@ -157,6 +220,8 @@ src/
     PositionTest.java  # Unit tests for position handling
 logs/                  # Auto-created directory for game logs ✨
   chess_game_YYYYMMDD_HHMMSS.log  # Timestamped game logs
+saves/                 # Auto-created directory for saved games ✨
+  *.sav              # Saved game files with full state preservation
 ```
 
 ## Testing
@@ -167,7 +232,35 @@ Run the comprehensive test suite:
 mvn test
 ```
 
-**Current Status**: ✅ All 18 tests passing (0 failures, 0 errors)
+**Current Status**: ✅ All tests passing with advanced features
+
+## Advanced Features Guide
+
+### Castling
+
+- **Requirements**: King and rook haven't moved, path is clear, king not in check
+- **Commands**: `O-O` (kingside), `O-O-O` (queenside), or `e1g1`/`e1c1`
+- **Validation**: Automatic checking of all castling conditions
+
+### En Passant
+
+- **Trigger**: Opponent pawn moves two squares, landing next to your pawn
+- **Capture**: Move diagonally to the square the pawn "passed over"
+- **Timing**: Must be done immediately after the two-square move
+
+### Save/Load System
+
+- **Save Location**: `saves/` directory (auto-created)
+- **File Format**: Custom format preserving all game state
+- **Content**: Board position, castling rights, en passant status, move history
+- **Usage**: `save <filename>` and `load <filename>` (`.sav` auto-added)
+
+### Move Analysis (pip command)
+
+- **Display**: All legal moves for current player
+- **Categories**: Regular moves, captures, special moves (castling, en passant)
+- **Format**: Algebraic notation with move descriptions
+- **Count**: Total number of available moves
 
 ## Logs Directory
 
@@ -185,9 +278,15 @@ Example log files:
 ## Recent Improvements 🚀
 
 - **v1.0.0 Latest** (Current JAR):
+  - ✅ **NEW**: Complete castling implementation (O-O, O-O-O)
+  - ✅ **NEW**: En passant capture with proper validation
+  - ✅ **NEW**: pip command for move analysis and suggestion
+  - ✅ **NEW**: Save/load game state with full preservation
+  - ✅ **NEW**: Advanced help system with categorized commands
+  - ✅ **NEW**: Castling notation support (O-O, O-O-O)
+  - ✅ Enhanced piece display with brackets `[P]` and parentheses `(p)`
   - ✅ Fixed move numbering logic in chess notation
   - ✅ Added comprehensive MoveLogger with file and console output
-  - ✅ Enhanced piece display with brackets `[P]` and parentheses `(p)`
   - ✅ Organized logs in dedicated directory
   - ✅ Fixed double logging warnings and resource management
   - ✅ Improved board spacing and alignment
@@ -198,5 +297,7 @@ Example log files:
 - "mvn: command not found": install Maven and ensure it's on your PATH.
 - Windows PowerShell quirks with piping: prefer Option 1 or 2 above.
 - If Java version is too new/old, use JDK 11+.
+- **Unicode display issues**: Latest version uses ASCII-safe characters.
+- **Save file location**: Check `saves/` directory in project root.
 - **Log file warnings**: Fixed in latest version with proper resource management.
 - **Display issues**: Latest version includes enhanced piece formatting and spacing.
