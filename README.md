@@ -109,12 +109,20 @@ This compiles with `javac` and runs the game without Maven.
 ### Option 4: Pre-built JAR file
 
 ```bash
-java -jar console-chess-1.0.0.jar
+java -jar console-chess-1.0.1.jar
 ```
 
-The JAR includes all latest advanced features and improvements.
+The JAR includes all latest advanced features, improvements, and bug fixes.
 
-### Option 5: Manual compile and run on Windows (no Maven)
+### Option 5: Windows JAR launcher (recommended for end users)
+
+```bat
+run-jar.bat
+```
+
+Convenient Windows batch script that launches the JAR directly with version display and pause functionality for easy distribution.
+
+### Option 6: Manual compile and run on Windows (no Maven)
 
 If you prefer direct `javac`/`java` commands:
 
@@ -277,7 +285,14 @@ Example log files:
 
 ## Recent Improvements 🚀
 
-- **v1.0.0 Latest** (Current JAR):
+- **v1.0.1 Latest** (Current JAR):
+  - 🐛 **FIXED**: Save/load functionality - pieces now correctly appear after loading
+  - 🐛 **FIXED**: Current player state compatibility between save and load operations
+  - 🐛 **FIXED**: Piece type enum format mismatch in save files
+  - 🐛 **FIXED**: Multi-line board data parsing for proper game restoration
+  - ✅ **NEW**: Added backward compatibility for existing save files
+  - ✅ **NEW**: run-jar.bat convenience script for easy JAR distribution
+- **v1.0.0**:
   - ✅ **NEW**: Complete castling implementation (O-O, O-O-O)
   - ✅ **NEW**: En passant capture with proper validation
   - ✅ **NEW**: pip command for move analysis and suggestion
