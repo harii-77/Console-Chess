@@ -396,7 +396,7 @@ public class ChessGame {
             // Add player information
             StringBuilder fullSave = new StringBuilder();
             fullSave.append("PLAYERS:").append(whitePlayer.getName()).append(",").append(blackPlayer.getName()).append("\n");
-            fullSave.append("CURRENT:").append(currentPlayer.getColor()).append("\n");
+            fullSave.append("CURRENT:").append(currentPlayer.getColor().name()).append("\n");
             fullSave.append(gameState);
             
             try (BufferedWriter writer = new BufferedWriter(new FileWriter(filepath))) {
@@ -443,7 +443,19 @@ public class ChessGame {
                     whitePlayer = new Player(playerNames[0], PieceColor.WHITE);
                     blackPlayer = new Player(playerNames[1], PieceColor.BLACK);
                 } else if (line.startsWith("CURRENT:")) {
-                    PieceColor currentColor = PieceColor.valueOf(line.substring(8));
+                    String colorString = line.substring(8);
+                    PieceColor currentColor;
+                    
+                    // Handle both old format (White/Black) and new format (WHITE/BLACK)
+                    if (colorString.equals("White") || colorString.equals("WHITE")) {
+                        currentColor = PieceColor.WHITE;
+                    } else if (colorString.equals("Black") || colorString.equals("BLACK")) {
+                        currentColor = PieceColor.BLACK;
+                    } else {
+                        // Fallback: try direct enum valueOf
+                        currentColor = PieceColor.valueOf(colorString);
+                    }
+                    
                     currentPlayer = (currentColor == PieceColor.WHITE) ? whitePlayer : blackPlayer;
                 }
             }

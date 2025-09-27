@@ -637,7 +637,7 @@ public class Board {
                 Piece piece = squares[row][col];
                 if (piece != null) {
                     sb.append(positionToNotation(new Position(row, col)))
-                      .append(":").append(piece.getColor()).append("_").append(piece.getType())
+                      .append(":").append(piece.getColor().name()).append("_").append(piece.getType().name())
                       .append(" ");
                 }
             }
@@ -686,9 +686,18 @@ public class Board {
             }
             
             // Load board state
-            for (String line : lines) {
+            boolean foundBoard = false;
+            for (int i = 0; i < lines.length; i++) {
+                String line = lines[i];
                 if (line.startsWith("BOARD:")) {
+                    foundBoard = true;
                     String boardData = line.substring(6).trim();
+                    
+                    // If board data is empty, check the next line
+                    if (boardData.isEmpty() && i + 1 < lines.length) {
+                        boardData = lines[i + 1].trim();
+                    }
+                    
                     if (!boardData.isEmpty()) {
                         String[] pieces = boardData.split(" ");
                         for (String pieceData : pieces) {
@@ -696,12 +705,38 @@ public class Board {
                                 String[] parts = pieceData.split(":");
                                 Position pos = notationToPosition(parts[0]);
                                 String[] colorType = parts[1].split("_");
-                                PieceColor color = PieceColor.valueOf(colorType[0]);
-                                PieceType type = PieceType.valueOf(colorType[1]);
+                                
+                                // Parse color - handle both formats
+                                PieceColor color;
+                                if (colorType[0].equals("White") || colorType[0].equals("WHITE")) {
+                                    color = PieceColor.WHITE;
+                                } else if (colorType[0].equals("Black") || colorType[0].equals("BLACK")) {
+                                    color = PieceColor.BLACK;
+                                } else {
+                                    color = PieceColor.valueOf(colorType[0]);
+                                }
+                                
+                                // Parse piece type - handle both old format (P, R, N, etc.) and new format (PAWN, ROOK, etc.)
+                                PieceType type;
+                                String typeString = colorType[1];
+                                switch (typeString) {
+                                    case "P": type = PieceType.PAWN; break;
+                                    case "R": type = PieceType.ROOK; break;
+                                    case "N": type = PieceType.KNIGHT; break;
+                                    case "B": type = PieceType.BISHOP; break;
+                                    case "Q": type = PieceType.QUEEN; break;
+                                    case "K": type = PieceType.KING; break;
+                                    default:
+                                        // Try direct enum valueOf for new format
+                                        type = PieceType.valueOf(typeString);
+                                        break;
+                                }
+                                
                                 setPiece(pos, new Piece(type, color));
                             }
                         }
                     }
+                    break; // Found and processed board data, exit loop
                 } else if (line.startsWith("CASTLING:")) {
                     String[] castlingData = line.substring(9).split(",");
                     whiteKingMoved = Boolean.parseBoolean(castlingData[0]);
