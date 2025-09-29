@@ -1,13 +1,78 @@
 package com.consolechess;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
- * Represents the chess board and handles piece placement and movement validation.
+ * Represents a chess board with comprehensive game state management and move validation.
+ * 
+ * <p>This class serves as the core game engine for chess, handling:</p>
+ * <ul>
+ *   <li>Piece placement and movement on an 8x8 chess board</li>
+ *   <li>Advanced chess rules: castling, en passant, pawn promotion</li>
+ *   <li>Move validation and legality checking</li>
+ *   <li>Check, checkmate, and stalemate detection</li>
+ *   <li>Game state tracking and move history</li>
+ *   <li>Board serialization for save/load functionality</li>
+ * </ul>
+ * 
+ * <p>The board uses a standard coordinate system where:</p>
+ * <ul>
+ *   <li>Rows: 0-7 (0=rank 8, 7=rank 1 in chess notation)</li>
+ *   <li>Columns: 0-7 (0=file a, 7=file h in chess notation)</li>
+ *   <li>White pieces start on rows 6-7, black pieces on rows 0-1</li>
+ * </ul>
+ * 
+ * <p><strong>Thread Safety:</strong> This class is not thread-safe. External synchronization
+ * is required if accessed from multiple threads.</p>
+ * 
+ * @author Console Chess Team
+ * @version 1.1
+ * @since 1.0
  */
 public class Board {
-    private static final int BOARD_SIZE = 8;
-    private Piece[][] squares;
+    
+    // Board configuration constants
+    /** Standard chess board size (8x8) */
+    public static final int BOARD_SIZE = 8;
+    
+    /** Minimum valid coordinate value */
+    public static final int MIN_COORDINATE = 0;
+    
+    /** Maximum valid coordinate value */
+    public static final int MAX_COORDINATE = BOARD_SIZE - 1;
+    
+    // Starting positions constants
+    /** White pieces starting row (rank 1 in chess notation) */
+    public static final int WHITE_BACK_RANK = 7;
+    
+    /** White pawns starting row (rank 2 in chess notation) */
+    public static final int WHITE_PAWN_RANK = 6;
+    
+    /** Black pieces starting row (rank 8 in chess notation) */
+    public static final int BLACK_BACK_RANK = 0;
+    
+    /** Black pawns starting row (rank 7 in chess notation) */
+    public static final int BLACK_PAWN_RANK = 1;
+    
+    // Castling constants
+    /** King's starting column */
+    public static final int KING_START_COLUMN = 4;
+    
+    /** Kingside castling target column for king */
+    public static final int KINGSIDE_KING_TARGET = 6;
+    
+    /** Queenside castling target column for king */
+    public static final int QUEENSIDE_KING_TARGET = 2;
+    
+    /** Kingside rook starting column */
+    public static final int KINGSIDE_ROOK_COLUMN = 7;
+    
+    /** Queenside rook starting column */
+    public static final int QUEENSIDE_ROOK_COLUMN = 0;
+    
+    // Game state
+    private final Piece[][] squares;
     
     // Castling rights tracking
     private boolean whiteKingMoved;
@@ -22,8 +87,19 @@ public class Board {
     private int lastMoveNumber; // Track move number for en passant timing
     
     // Move history for save/load functionality
-    private List<String> moveHistory;
+    private final List<String> moveHistory;
     
+    /**
+     * Constructs a new chess board in the standard starting position.
+     * 
+     * <p>Initializes:</p>
+     * <ul>
+     *   <li>8x8 board with pieces in standard chess starting positions</li>
+     *   <li>All castling rights enabled</li>
+     *   <li>No en passant target</li>
+     *   <li>Empty move history</li>
+     * </ul>
+     */
     public Board() {
         this.squares = new Piece[BOARD_SIZE][BOARD_SIZE];
         this.whiteKingMoved = false;
@@ -39,49 +115,78 @@ public class Board {
     }
     
     /**
-     * Initialize the board with pieces in their starting positions.
+     * Initialize the board with pieces in their standard starting positions.
+     * 
+     * <p>Sets up the complete chess starting position:</p>
+     * <ul>
+     *   <li>White pieces on ranks 1-2 (rows 6-7 in array coordinates)</li>
+     *   <li>Black pieces on ranks 7-8 (rows 0-1 in array coordinates)</li>
+     *   <li>All other squares empty</li>
+     * </ul>
+     * 
+     * <p>Starting position follows FIDE standards:
+     * White: a1=Rook, b1=Knight, c1=Bishop, d1=Queen, e1=King, f1=Bishop, g1=Knight, h1=Rook
+     * with pawns on the 2nd rank.</p>
      */
     private void initializeBoard() {
-        // Clear the board
+        // Clear the entire board first
+        clearBoard();
+        
+        // Place white pieces on back rank (row 7 = rank 1)
+        squares[WHITE_BACK_RANK][QUEENSIDE_ROOK_COLUMN] = new Piece(PieceType.ROOK, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][1] = new Piece(PieceType.KNIGHT, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][2] = new Piece(PieceType.BISHOP, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][3] = new Piece(PieceType.QUEEN, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][KING_START_COLUMN] = new Piece(PieceType.KING, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][5] = new Piece(PieceType.BISHOP, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][6] = new Piece(PieceType.KNIGHT, PieceColor.WHITE);
+        squares[WHITE_BACK_RANK][KINGSIDE_ROOK_COLUMN] = new Piece(PieceType.ROOK, PieceColor.WHITE);
+        
+        // Place white pawns on second rank (row 6 = rank 2)
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            squares[WHITE_PAWN_RANK][col] = new Piece(PieceType.PAWN, PieceColor.WHITE);
+        }
+        
+        // Place black pieces on back rank (row 0 = rank 8)
+        squares[BLACK_BACK_RANK][QUEENSIDE_ROOK_COLUMN] = new Piece(PieceType.ROOK, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][1] = new Piece(PieceType.KNIGHT, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][2] = new Piece(PieceType.BISHOP, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][3] = new Piece(PieceType.QUEEN, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][KING_START_COLUMN] = new Piece(PieceType.KING, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][5] = new Piece(PieceType.BISHOP, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][6] = new Piece(PieceType.KNIGHT, PieceColor.BLACK);
+        squares[BLACK_BACK_RANK][KINGSIDE_ROOK_COLUMN] = new Piece(PieceType.ROOK, PieceColor.BLACK);
+        
+        // Place black pawns on seventh rank (row 1 = rank 7)
+        for (int col = 0; col < BOARD_SIZE; col++) {
+            squares[BLACK_PAWN_RANK][col] = new Piece(PieceType.PAWN, PieceColor.BLACK);
+        }
+    }
+    
+    /**
+     * Clear all pieces from the board.
+     * Sets all squares to null, creating an empty board.
+     */
+    private void clearBoard() {
         for (int row = 0; row < BOARD_SIZE; row++) {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 squares[row][col] = null;
             }
         }
-        
-        // Place white pieces
-        squares[7][0] = new Piece(PieceType.ROOK, PieceColor.WHITE);
-        squares[7][1] = new Piece(PieceType.KNIGHT, PieceColor.WHITE);
-        squares[7][2] = new Piece(PieceType.BISHOP, PieceColor.WHITE);
-        squares[7][3] = new Piece(PieceType.QUEEN, PieceColor.WHITE);
-        squares[7][4] = new Piece(PieceType.KING, PieceColor.WHITE);
-        squares[7][5] = new Piece(PieceType.BISHOP, PieceColor.WHITE);
-        squares[7][6] = new Piece(PieceType.KNIGHT, PieceColor.WHITE);
-        squares[7][7] = new Piece(PieceType.ROOK, PieceColor.WHITE);
-        
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            squares[6][col] = new Piece(PieceType.PAWN, PieceColor.WHITE);
-        }
-        
-        // Place black pieces
-        squares[0][0] = new Piece(PieceType.ROOK, PieceColor.BLACK);
-        squares[0][1] = new Piece(PieceType.KNIGHT, PieceColor.BLACK);
-        squares[0][2] = new Piece(PieceType.BISHOP, PieceColor.BLACK);
-        squares[0][3] = new Piece(PieceType.QUEEN, PieceColor.BLACK);
-        squares[0][4] = new Piece(PieceType.KING, PieceColor.BLACK);
-        squares[0][5] = new Piece(PieceType.BISHOP, PieceColor.BLACK);
-        squares[0][6] = new Piece(PieceType.KNIGHT, PieceColor.BLACK);
-        squares[0][7] = new Piece(PieceType.ROOK, PieceColor.BLACK);
-        
-        for (int col = 0; col < BOARD_SIZE; col++) {
-            squares[1][col] = new Piece(PieceType.PAWN, PieceColor.BLACK);
-        }
     }
     
     /**
      * Get the piece at the specified position.
+     * 
+     * @param position the board position to query (not null)
+     * @return the piece at the position, or null if the position is empty or invalid
+     * @throws IllegalArgumentException if position is null
      */
     public Piece getPiece(Position position) {
+        if (position == null) {
+            throw new IllegalArgumentException("Position cannot be null");
+        }
+        
         if (isValidPosition(position)) {
             return squares[position.getRow()][position.getColumn()];
         }
@@ -90,19 +195,39 @@ public class Board {
     
     /**
      * Set a piece at the specified position.
+     * 
+     * @param position the board position to set (not null)
+     * @param piece the piece to place at the position (may be null to clear the square)
+     * @throws IllegalArgumentException if position is null or invalid
      */
     public void setPiece(Position position, Piece piece) {
-        if (isValidPosition(position)) {
-            squares[position.getRow()][position.getColumn()] = piece;
+        if (position == null) {
+            throw new IllegalArgumentException("Position cannot be null");
         }
+        
+        if (!isValidPosition(position)) {
+            throw new IllegalArgumentException("Position is outside the board: " + position);
+        }
+        
+        squares[position.getRow()][position.getColumn()] = piece;
     }
     
     /**
-     * Check if a position is valid on the board.
+     * Check if a position is valid on the chess board.
+     * 
+     * @param position the position to validate (not null)
+     * @return true if the position is within board boundaries [0-7, 0-7]
+     * @throws IllegalArgumentException if position is null
      */
     public boolean isValidPosition(Position position) {
-        return position.getRow() >= 0 && position.getRow() < BOARD_SIZE &&
-               position.getColumn() >= 0 && position.getColumn() < BOARD_SIZE;
+        if (position == null) {
+            throw new IllegalArgumentException("Position cannot be null");
+        }
+        
+        int row = position.getRow();
+        int column = position.getColumn();
+        return row >= MIN_COORDINATE && row <= MAX_COORDINATE &&
+               column >= MIN_COORDINATE && column <= MAX_COORDINATE;
     }
     
     /**
