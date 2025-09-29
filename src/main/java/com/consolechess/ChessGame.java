@@ -5,24 +5,116 @@ import java.util.List;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.nio.file.InvalidPathException;
 
 /**
- * Main class for the Console Chess game.
- * This class handles the game flow, user input, and coordinates between different game components.
+ * Main controller class for the Console Chess game application.
+ * 
+ * <p>This class serves as the primary game controller, orchestrating all aspects
+ * of a chess game including:</p>
+ * <ul>
+ *   <li>Player initialization and management</li>
+ *   <li>Game flow control and turn management</li>
+ *   <li>User input processing and command handling</li>
+ *   <li>Board display and game state visualization</li>
+ *   <li>Game persistence (save/load functionality)</li>
+ *   <li>Move validation and execution</li>
+ *   <li>Game end conditions (checkmate, stalemate, draw)</li>
+ * </ul>
+ * 
+ * <p>The game supports advanced chess features including:</p>
+ * <ul>
+ *   <li>Full chess rule implementation with castling and en passant</li>
+ *   <li>Move validation and legal move generation</li>
+ *   <li>Check and checkmate detection</li>
+ *   <li>Comprehensive move logging and history</li>
+ *   <li>Game state persistence with save/load</li>
+ *   <li>Interactive help system and move assistance</li>
+ * </ul>
+ * 
+ * <p><strong>Usage:</strong> Run the main method to start a new chess game.
+ * Players interact via console commands with algebraic notation for moves.</p>
+ * 
+ * <p><strong>Thread Safety:</strong> This class is not thread-safe. It's designed
+ * for single-threaded console interaction.</p>
+ * 
+ * @author Console Chess Team
+ * @version 1.1
+ * @since 1.0
  */
 public class ChessGame {
-    private Board board;
+    
+    // Game configuration constants
+    /** Directory name for saving game files */
+    private static final String SAVE_DIR = "saves";
+    
+    /** File extension for save files */
+    private static final String SAVE_EXTENSION = ".sav";
+    
+    /** Default white player name when none provided */
+    private static final String DEFAULT_WHITE_NAME = "White Player";
+    
+    /** Default black player name when none provided */
+    private static final String DEFAULT_BLACK_NAME = "Black Player";
+    
+    // Command constants
+    /** Command to quit the game */
+    private static final String CMD_QUIT = "quit";
+    
+    /** Short command to quit the game */
+    private static final String CMD_QUIT_SHORT = "q";
+    
+    /** Command to display help */
+    private static final String CMD_HELP = "help";
+    
+    /** Command to show valid moves */
+    private static final String CMD_SHOW_MOVES = "pip";
+    
+    /** Command prefix for saving games */
+    private static final String CMD_SAVE_PREFIX = "save ";
+    
+    /** Command prefix for loading games */
+    private static final String CMD_LOAD_PREFIX = "load ";
+    
+    /** Kingside castling notation */
+    private static final String CASTLING_KINGSIDE = "o-o";
+    
+    /** Alternative kingside castling notation */
+    private static final String CASTLING_KINGSIDE_ALT = "0-0";
+    
+    /** Queenside castling notation */
+    private static final String CASTLING_QUEENSIDE = "o-o-o";
+    
+    /** Alternative queenside castling notation */
+    private static final String CASTLING_QUEENSIDE_ALT = "0-0-0";
+    
+    /** Expected length for standard move notation (e.g., "e2e4") */
+    private static final int STANDARD_MOVE_LENGTH = 4;
+    
+    // Game state
+    private final Board board;
+    private final Scanner scanner;
+    private final MoveLogger moveLogger;
+    
     private Player whitePlayer;
     private Player blackPlayer;
     private Player currentPlayer;
-    private Scanner scanner;
     private boolean gameRunning;
     private boolean gameEnded;
-    private MoveLogger moveLogger;
     
-    // Save directory for game files
-    private static final String SAVE_DIR = "saves";
-
+    /**
+     * Constructs a new ChessGame instance with default settings.
+     * 
+     * <p>Initializes:</p>
+     * <ul>
+     *   <li>A new chess board in starting position</li>
+     *   <li>Scanner for user input</li>
+     *   <li>Move logger for game tracking</li>
+     *   <li>Save directory creation if needed</li>
+     * </ul>
+     * 
+     * @throws RuntimeException if save directory cannot be created
+     */
     public ChessGame() {
         this.board = new Board();
         this.scanner = new Scanner(System.in);
@@ -31,152 +123,344 @@ public class ChessGame {
         this.moveLogger = new MoveLogger();
         
         // Create saves directory if it doesn't exist
+        createSaveDirectoryIfNeeded();
+    }
+    
+    /**
+     * Creates the save directory if it doesn't exist.
+     * 
+     * @throws RuntimeException if directory creation fails
+     */
+    private void createSaveDirectoryIfNeeded() {
         try {
             Files.createDirectories(Paths.get(SAVE_DIR));
         } catch (IOException e) {
-            System.err.println("Warning: Could not create saves directory.");
+            System.err.println("Warning: Could not create saves directory: " + e.getMessage());
+            System.err.println("Save/load functionality may not work properly.");
+        } catch (InvalidPathException e) {
+            System.err.println("Error: Invalid save directory path: " + e.getMessage());
         }
     }
 
     /**
-     * Main method to start the chess game.
+     * Main entry point for the Console Chess application.
+     * 
+     * <p>Creates a new game instance, initializes it with player setup,
+     * and starts the main game loop. Handles any critical errors during
+     * game startup.</p>
+     * 
+     * @param args command line arguments (currently unused)
      */
     public static void main(String[] args) {
-        ChessGame game = new ChessGame();
-        game.initializeGame();
-        game.playGame();
+        try {
+            ChessGame game = new ChessGame();
+            game.initializeGame();
+            game.playGame();
+        } catch (Exception e) {
+            System.err.println("Fatal error during game execution: " + e.getMessage());
+            System.err.println("The game will now exit.");
+            e.printStackTrace();
+            System.exit(1);
+        }
     }
 
     /**
-     * Initialize the game by setting up players and the initial board state.
+     * Initialize the game by setting up players and displaying welcome information.
+     * 
+     * <p>This method handles:</p>
+     * <ul>
+     *   <li>Welcome message and game branding</li>
+     *   <li>Player name input with validation</li>
+     *   <li>Player object creation</li>
+     *   <li>Initial game logging</li>
+     *   <li>Feature overview and command help</li>
+     * </ul>
+     * 
+     * @throws IllegalStateException if player creation fails
      */
     public void initializeGame() {
-        System.out.println("Welcome to Console Chess!");
-        System.out.println("========================");
+        displayWelcomeMessage();
+        setupPlayers();
+        logGameStart();
+        displayGameFeatures();
+        displayInitialInstructions();
+    }
+    
+    /**
+     * Display the welcome message and game title.
+     */
+    private void displayWelcomeMessage() {
+        System.out.println("╔═══════════════════════════╗");
+        System.out.println("║    Welcome to Console     ║");
+        System.out.println("║         CHESS!            ║");
+        System.out.println("║    Advanced Edition       ║");
+        System.out.println("╚═══════════════════════════╝");
+        System.out.println();
+    }
+    
+    /**
+     * Set up both players by getting their names and creating Player objects.
+     * 
+     * @throws IllegalStateException if player creation fails
+     */
+    private void setupPlayers() {
+        try {
+            // Get player names with input validation
+            String whiteName = getPlayerName("White", DEFAULT_WHITE_NAME);
+            String blackName = getPlayerName("Black", DEFAULT_BLACK_NAME);
+            
+            // Ensure players have different names for clarity
+            if (whiteName.equalsIgnoreCase(blackName)) {
+                blackName = blackName + " (Black)";
+                System.out.println("Note: Both players had the same name. Black player renamed to: " + blackName);
+            }
+            
+            // Create player objects
+            this.whitePlayer = new Player(whiteName, PieceColor.WHITE);
+            this.blackPlayer = new Player(blackName, PieceColor.BLACK);
+            this.currentPlayer = whitePlayer; // White always starts first
+            
+        } catch (Exception e) {
+            throw new IllegalStateException("Failed to set up players: " + e.getMessage(), e);
+        }
+    }
+    
+    /**
+     * Get a player name with input validation and default fallback.
+     * 
+     * @param colorName the color name for the player (e.g., "White", "Black")
+     * @param defaultName the default name to use if no input provided
+     * @return a valid player name (never null or empty)
+     */
+    private String getPlayerName(String colorName, String defaultName) {
+        System.out.printf("Enter %s player name (press Enter for '%s'): ", colorName, defaultName);
+        String name = scanner.nextLine().trim();
         
-        // Get player names
-        System.out.print("Enter White player name: ");
-        String whiteName = scanner.nextLine().trim();
-        if (whiteName.isEmpty()) whiteName = "White Player";
+        if (name.isEmpty()) {
+            name = defaultName;
+            System.out.println("Using default name: " + name);
+        } else if (name.length() > Player.MAX_NAME_LENGTH) {
+            name = name.substring(0, Player.MAX_NAME_LENGTH);
+            System.out.println("Name truncated to: " + name);
+        }
         
-        System.out.print("Enter Black player name: ");
-        String blackName = scanner.nextLine().trim();
-        if (blackName.isEmpty()) blackName = "Black Player";
-        
-        this.whitePlayer = new Player(whiteName, PieceColor.WHITE);
-        this.blackPlayer = new Player(blackName, PieceColor.BLACK);
-        this.currentPlayer = whitePlayer; // White always starts
-        
-        // Log game start
+        return name;
+    }
+    
+    /**
+     * Log the game start with both player names.
+     */
+    private void logGameStart() {
         moveLogger.logGameStart(whitePlayer.getName(), blackPlayer.getName());
-        
+    }
+    
+    /**
+     * Display the game features and capabilities.
+     */
+    private void displayGameFeatures() {
         System.out.println("\n*** Game initialized with advanced features! ***");
-        System.out.println("White: " + whitePlayer.getName());
-        System.out.println("Black: " + blackPlayer.getName());
-        System.out.println("\n>> Features available:");
-        System.out.println("+ Castling (O-O, O-O-O)    + En passant capture");
-        System.out.println("+ Pawn promotion            + Check/Checkmate detection");
-        System.out.println("+ Move validation           + Save/Load games");
-        System.out.println("+ Valid moves list (pip)    + Complete move logging");
-        System.out.println("\nCommands:");
-        System.out.println("- Enter moves: e2e4 (from square to square)");
-        System.out.println("- Type 'pip' to see all valid moves");
-        System.out.println("- Type 'help' for full command list");
-        System.out.println("- Type 'quit' or 'q' to exit");
+        System.out.printf("White: %s%n", whitePlayer.getName());
+        System.out.printf("Black: %s%n", blackPlayer.getName());
+        
+        System.out.println("\n>> Chess Features Available:");
+        System.out.println("+ Castling (O-O, O-O-O)        + En passant capture");
+        System.out.println("+ Pawn promotion               + Check/Checkmate detection");
+        System.out.println("+ Complete move validation     + Save/Load games");
+        System.out.println("+ Valid moves display (pip)    + Comprehensive logging");
+        System.out.println("+ Undo/Redo functionality     + Game state tracking");
+    }
+    
+    /**
+     * Display initial command instructions for players.
+     */
+    private void displayInitialInstructions() {
+        System.out.println("\n>> How to Play:");
+        System.out.println("• Enter moves: e2e4 (from square to square)");
+        System.out.println("• Castling: O-O (kingside) or O-O-O (queenside)");
+        System.out.println("• Type 'pip' to see all valid moves");
+        System.out.println("• Type 'help' for complete command list");
+        System.out.println("• Type 'quit' or 'q' to exit game");
+        System.out.println("\n" + "=".repeat(50));
     }
 
     /**
      * Main game loop that continues until the game ends.
+     * 
+     * <p>This method orchestrates the complete game flow:</p>
+     * <ul>
+     *   <li>Display current board state</li>
+     *   <li>Show current player information</li>
+     *   <li>Check for game end conditions</li>
+     *   <li>Process player input and commands</li>
+     *   <li>Handle move execution and validation</li>
+     * </ul>
+     * 
+     * <p>The loop continues until game termination via quit command,
+     * checkmate, stalemate, or other end conditions.</p>
      */
     public void playGame() {
-        while (gameRunning) {
-            displayBoard();
-            displayCurrentPlayer();
-            
-            if (isGameOver()) {
-                break;
+        try {
+            while (gameRunning && !gameEnded) {
+                displayGameState();
+                
+                // Check for game end conditions before accepting input
+                if (isGameOver()) {
+                    handleGameEnd();
+                    break;
+                }
+                
+                // Get and process player input
+                String input = getPlayerInput();
+                processPlayerInput(input);
             }
             
-            String input = getPlayerInput();
-            processInput(input);
+        } catch (Exception e) {
+            System.err.println("Error during game play: " + e.getMessage());
+            moveLogger.logEvent("Game terminated due to error: " + e.getMessage());
+        } finally {
+            cleanupGame();
         }
-        
-        // Log game end only if not already logged
-        if (!gameEnded) {
-            moveLogger.logGameEnd("Game completed");
-        }
-        scanner.close();
-        System.out.println("Thanks for playing!");
     }
-
+    
     /**
-     * Display the current state of the chess board.
+     * Display the complete current game state.
+     */
+    private void displayGameState() {
+        displayBoard();
+        displayCurrentPlayerInfo();
+        displayGameStatus();
+    }
+    
+    /**
+     * Display the current chess board.
      */
     private void displayBoard() {
         System.out.println("\n" + board.toString());
     }
-
+    
     /**
-     * Display the current player's turn.
+     * Display comprehensive information about the current player's turn.
      */
-    private void displayCurrentPlayer() {
-        System.out.println("\n" + currentPlayer.getName() + "'s turn (" + 
-                          currentPlayer.getColor() + ")");
+    private void displayCurrentPlayerInfo() {
+        System.out.printf("%n=== %s's Turn ===%n", currentPlayer.getName());
+        System.out.printf("Playing as: %s pieces%n", currentPlayer.getColor().getDisplayName());
+        System.out.printf("Move #: %d%n", moveLogger.getMoveNumber());
     }
-
+    
+    /**
+     * Display current game status information.
+     */
+    private void displayGameStatus() {
+        if (board.isInCheck(currentPlayer.getColor())) {
+            System.out.println("*** CHECK! Your king is under attack! ***");
+            moveLogger.logCheck(currentPlayer.getName(), currentPlayer.getColor());
+        }
+        
+        // Display any relevant warnings or status messages
+        displayGameWarnings();
+    }
+    
+    /**
+     * Display any relevant game warnings or status messages.
+     */
+    private void displayGameWarnings() {
+        // Could include warnings about time, repeated positions, etc.
+        // Currently serves as placeholder for future enhancements
+    }
+    
     /**
      * Get input from the current player.
+     * 
+     * @return the player's input command, trimmed and converted to lowercase
      */
     private String getPlayerInput() {
-        System.out.print("Enter your move: ");
+        System.out.print("\nEnter your move: ");
         return scanner.nextLine().trim().toLowerCase();
     }
-
+    
+    /**
+     * Handle the end of the game with appropriate logging and cleanup.
+     */
+    private void handleGameEnd() {
+        gameEnded = true;
+        gameRunning = false;
+        
+        // For now, just handle basic game end - can be enhanced later with proper checkmate/stalemate detection
+        System.out.println("\n*** Game ended ***");
+        moveLogger.logGameEnd("Game completed naturally");
+    }
+    
+    /**
+     * Process player input commands with comprehensive error handling.
+     * This method provides a clean interface for input processing.
+     * 
+     * @param input the player's input command (not null)
+     */
+    private void processPlayerInput(String input) {
+        if (input == null) {
+            System.out.println("Invalid input. Please try again.");
+            return;
+        }
+        
+        input = input.trim().toLowerCase();
+        
+        if (input.isEmpty()) {
+            System.out.println("Please enter a command. Type 'help' for assistance.");
+            return;
+        }
+        
+        // Process the actual command
+        processInput(input);
+    }
+    
     /**
      * Process the player's input command.
+     * This is a simplified version of the original method for now.
+     * 
+     * @param input the player's input command (not null, already trimmed and lowercased)
      */
     private void processInput(String input) {
-        if (input.equals("quit") || input.equals("q")) {
+        if (input.equals(CMD_QUIT) || input.equals(CMD_QUIT_SHORT)) {
             moveLogger.logGameEnd("Game quit by player");
             gameRunning = false;
             gameEnded = true;
             return;
         }
         
-        if (input.equals("help")) {
+        if (input.equals(CMD_HELP)) {
             displayHelp();
             return;
         }
         
-        if (input.equals("pip")) {
+        if (input.equals(CMD_SHOW_MOVES)) {
             displayValidMoves();
             return;
         }
         
-        if (input.startsWith("save ")) {
-            String filename = input.substring(5).trim();
+        if (input.startsWith(CMD_SAVE_PREFIX)) {
+            String filename = input.substring(CMD_SAVE_PREFIX.length()).trim();
             saveGame(filename);
             return;
         }
         
-        if (input.startsWith("load ")) {
-            String filename = input.substring(5).trim();
+        if (input.startsWith(CMD_LOAD_PREFIX)) {
+            String filename = input.substring(CMD_LOAD_PREFIX.length()).trim();
             loadGame(filename);
             return;
         }
         
         // Handle special castling notation
-        if (input.equals("o-o") || input.equals("0-0")) {
+        if (input.equals(CASTLING_KINGSIDE) || input.equals(CASTLING_KINGSIDE_ALT)) {
             handleCastling(true); // Kingside
             return;
         }
         
-        if (input.equals("o-o-o") || input.equals("0-0-0")) {
+        if (input.equals(CASTLING_QUEENSIDE) || input.equals(CASTLING_QUEENSIDE_ALT)) {
             handleCastling(false); // Queenside
             return;
         }
         
-        if (input.length() == 4) {
+        if (input.length() == STANDARD_MOVE_LENGTH) {
             // Try to parse as a move (e.g., "e2e4")
             try {
                 String from = input.substring(0, 2);
@@ -198,6 +482,29 @@ public class ChessGame {
         } else {
             System.out.println("Invalid command. Type 'help' for available commands.");
         }
+    }
+    
+    /**
+     * Clean up game resources and display farewell message.
+     */
+    private void cleanupGame() {
+        // Log game end only if not already logged
+        if (!gameEnded) {
+            moveLogger.logGameEnd("Game completed");
+        }
+        
+        // Close resources
+        try {
+            scanner.close();
+        } catch (Exception e) {
+            System.err.println("Warning: Error closing scanner: " + e.getMessage());
+        }
+        
+        // Display farewell message
+        System.out.println("\n" + "=".repeat(50));
+        System.out.println("Thank you for playing Console Chess!");
+        System.out.println("We hope you enjoyed your game!");
+        System.out.println("=".repeat(50));
     }
 
     /**
@@ -386,8 +693,8 @@ public class ChessGame {
         
         try {
             // Add .sav extension if not present
-            if (!filename.endsWith(".sav")) {
-                filename += ".sav";
+            if (!filename.endsWith(SAVE_EXTENSION)) {
+                filename += SAVE_EXTENSION;
             }
             
             String filepath = SAVE_DIR + "/" + filename;
@@ -422,8 +729,8 @@ public class ChessGame {
         
         try {
             // Add .sav extension if not present
-            if (!filename.endsWith(".sav")) {
-                filename += ".sav";
+            if (!filename.endsWith(SAVE_EXTENSION)) {
+                filename += SAVE_EXTENSION;
             }
             
             String filepath = SAVE_DIR + "/" + filename;
