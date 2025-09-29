@@ -7,11 +7,11 @@
 
     <groupId>com.consolechess</groupId>
     <artifactId>console-chess</artifactId>
-    <version>1.0.1</version>
+    <version>1.1.0</version>
     <packaging>jar</packaging>
 
     <name>Console Chess</name>
-    <description>A console-based implementation of the game Chess using Java</description>
+    <description>A console-based implementation of the game Chess using Java with enhanced features, comprehensive documentation, and improved user experience</description>
 
     <properties>
         <maven.compiler.source>11</maven.compiler.source>
