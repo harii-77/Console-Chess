@@ -1,8 +1,0 @@
-PLAYERS:h,k
-CURRENT:White
-BOARD:
-a8:Black_R b8:Black_N c8:Black_B d8:Black_Q e8:Black_K f8:Black_B g8:Black_N h8:Black_R b7:Black_P c7:Black_P d7:Black_P e7:Black_P f7:Black_P g7:Black_P h7:Black_P a6:Black_P e4:White_P a2:White_P b2:White_P c2:White_P d2:White_P f2:White_P g2:White_P h2:White_P a1:White_R b1:White_N c1:White_B d1:White_Q e1:White_K f1:White_B g1:White_N h1:White_R 
-CASTLING:false,false,false,false,false,false
-ENPASSANT:none
-MOVES:e2e4 a7a6 
-MOVENUMBER:2

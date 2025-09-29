@@ -12,6 +12,10 @@
 .DS_Store
 Thumbs.db
 
+# User-generated content
+/saves/
+/logs/
+
 # Logs
 *.log
 
