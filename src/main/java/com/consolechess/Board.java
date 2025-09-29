@@ -922,7 +922,7 @@ public class Board {
                 if (piece != null) {
                     sb.append(piece.toString()).append(" ");
                 } else {
-                    sb.append(".   ");  // Empty square with spacing to match piece width
+                    sb.append(" .   ");  // Empty square with spacing to match piece width
                 }
             }
             sb.append(8 - row).append("\n");
