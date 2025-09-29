@@ -280,12 +280,12 @@ public class ChessGame {
      */
     private void displayInitialInstructions() {
         System.out.println("\n>> How to Play:");
-        System.out.println("• Enter moves: e2e4 (from square to square)");
-        System.out.println("• Castling: O-O (kingside) or O-O-O (queenside)");
-        System.out.println("• Type 'pip' to see all valid moves");
-        System.out.println("• Type 'display' to switch to Unicode symbols ♔ ♕ ♖ (if supported)");
-        System.out.println("• Type 'help' for complete command list");
-        System.out.println("• Type 'quit' or 'q' to exit game");
+        System.out.println("- Enter moves: e2e4 (from square to square)");
+        System.out.println("- Castling: O-O (kingside) or O-O-O (queenside)");
+        System.out.println("- Type 'pip' to see all valid moves");
+        System.out.println("- Type 'display' to switch to Unicode symbols (if supported)");
+        System.out.println("- Type 'help' for complete command list");
+        System.out.println("- Type 'quit' or 'q' to exit game");
         System.out.println("\n" + "=".repeat(50));
     }
 
