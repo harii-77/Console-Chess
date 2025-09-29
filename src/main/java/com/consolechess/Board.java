@@ -947,11 +947,11 @@ public class Board {
                 if (piece != null) {
                     sb.append(piece.toString(displayMode)).append(" ");
                 } else {
-                    // For Unicode mode, use different empty square representation
+                    // Empty square: make it exactly 4 characters to match piece + space format
                     if (displayMode == Piece.DisplayMode.UNICODE) {
-                        sb.append(" · ");  // Unicode middle dot for empty squares in Unicode mode
+                        sb.append(" ·  ");  // space-dot-space-space = 4 chars total
                     } else {
-                        sb.append(" . ");  // Regular dot for other modes
+                        sb.append(" .  ");  // space-dot-space-space = 4 chars total  
                     }
                 }
             }
