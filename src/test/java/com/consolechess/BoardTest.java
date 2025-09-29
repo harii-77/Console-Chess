@@ -5,6 +5,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -54,12 +55,20 @@ public class BoardTest {
     
     @Test
     public void testValidPosition() {
+        // Test valid positions
         assertTrue(board.isValidPosition(new Position(0, 0))); // a8
         assertTrue(board.isValidPosition(new Position(7, 7))); // h1
-        assertFalse(board.isValidPosition(new Position(-1, 0))); // Invalid
-        assertFalse(board.isValidPosition(new Position(0, -1))); // Invalid
-        assertFalse(board.isValidPosition(new Position(8, 0))); // Invalid
-        assertFalse(board.isValidPosition(new Position(0, 8))); // Invalid
+        assertTrue(board.isValidPosition(new Position(3, 4))); // e5
+        assertTrue(board.isValidPosition(new Position(0, 7))); // h8
+        assertTrue(board.isValidPosition(new Position(7, 0))); // a1
+        
+        // Test that Position constructor throws exception for invalid coordinates
+        assertThrows(IllegalArgumentException.class, () -> new Position(-1, 0)); // Invalid row
+        assertThrows(IllegalArgumentException.class, () -> new Position(0, -1)); // Invalid column
+        assertThrows(IllegalArgumentException.class, () -> new Position(8, 0)); // Invalid row
+        assertThrows(IllegalArgumentException.class, () -> new Position(0, 8)); // Invalid column
+        assertThrows(IllegalArgumentException.class, () -> new Position(-1, -1)); // Both invalid
+        assertThrows(IllegalArgumentException.class, () -> new Position(8, 8)); // Both invalid
     }
     
     @Test
