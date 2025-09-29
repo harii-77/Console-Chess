@@ -146,6 +146,7 @@ java -cp target/classes com.consolechess.ChessGame
 
    - **Movement**: `e2e4` (standard notation), `O-O` (kingside castling), `O-O-O` (queenside castling)
    - **Information**: `pip` (show all valid moves), `help` (show all commands)
+   - **Display**: `display` (toggle between [P] and Unicode ♔ symbols)
    - **Game Control**: `quit` or `q` (exit game with proper cleanup)
    - **File Operations**: `save <name>` (save game), `load <name>` (load game)
 
@@ -188,6 +189,26 @@ Enter your move: O-O-O        # Queenside castling
 ```
 Enter your move: save mygame    # Saves to saves/mygame.sav
 Enter your move: load mygame    # Loads from saves/mygame.sav
+```
+
+#### Display Mode Toggle Examples
+
+```
+Enter your move: display
+Display mode changed to: Unicode Chess Symbols
+Example: ♔ ♕ ♖ ♗ ♘ ♙ (if your terminal supports Unicode)
+
+# Board now shows:
+8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜ 8
+7 ♟ ♟ ♟ ♟ ♟  ·  ♟ ♟ 7
+
+Enter your move: display
+Display mode changed to: Standard Bracketed (with colors)
+Example: [P] (p) - Yellow for white, cyan for black
+
+# Board now shows:
+8 (r) (n) (b) (q) (k) (b) (n) (r) 8
+7 (p) (p) (p) (p) (p)  .  (p) (p) 7
 ```
 
 ### Sample Log Output
@@ -430,6 +451,14 @@ Example log files:
 - ✅ **Cross-Platform**: Windows, Linux, macOS compatible
 - ✅ **Backward Compatible**: Maintains all existing functionality
 - ✅ **Documentation**: 100% method coverage with comprehensive JavaDoc
+
+### 🆕 **Latest Additions (Post v1.1.0)**:
+
+- 🎨 **Unicode Display Toggle**: Added `display` command to switch between [P] and ♔ symbols
+- 🐛 **Board Alignment Fix**: Perfect spacing alignment for empty squares
+- 🐛 **Encoding Fixes**: Removed Unicode bullet points causing margin display issues
+- 🗂️ **Git Repository Cleanup**: Removed user save files from version control
+- 📦 **JAR Updates**: Rebuilt with all latest display and alignment features
 
 - **v1.0.1**:
 
