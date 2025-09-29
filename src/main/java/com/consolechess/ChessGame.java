@@ -76,6 +76,9 @@ public class ChessGame {
     /** Command prefix for loading games */
     private static final String CMD_LOAD_PREFIX = "load ";
     
+    /** Command to change display mode */
+    private static final String CMD_DISPLAY = "display";
+    
     /** Kingside castling notation */
     private static final String CASTLING_KINGSIDE = "o-o";
     
@@ -101,6 +104,7 @@ public class ChessGame {
     private Player currentPlayer;
     private boolean gameRunning;
     private boolean gameEnded;
+    private Piece.DisplayMode currentDisplayMode;
     
     /**
      * Constructs a new ChessGame instance with default settings.
@@ -121,6 +125,7 @@ public class ChessGame {
         this.gameRunning = true;
         this.gameEnded = false;
         this.moveLogger = new MoveLogger();
+        this.currentDisplayMode = Piece.DisplayMode.COLORED_BRACKETED; // Default to standard bracketed
         
         // Create saves directory if it doesn't exist
         createSaveDirectoryIfNeeded();
@@ -278,6 +283,7 @@ public class ChessGame {
         System.out.println("• Enter moves: e2e4 (from square to square)");
         System.out.println("• Castling: O-O (kingside) or O-O-O (queenside)");
         System.out.println("• Type 'pip' to see all valid moves");
+        System.out.println("• Type 'display' to switch to Unicode symbols ♔ ♕ ♖ (if supported)");
         System.out.println("• Type 'help' for complete command list");
         System.out.println("• Type 'quit' or 'q' to exit game");
         System.out.println("\n" + "=".repeat(50));
@@ -448,6 +454,11 @@ public class ChessGame {
             loadGame(filename);
             return;
         }
+
+        if (input.equals(CMD_DISPLAY)) {
+            toggleDisplayMode();
+            return;
+        }
         
         // Handle special castling notation
         if (input.equals(CASTLING_KINGSIDE) || input.equals(CASTLING_KINGSIDE_ALT)) {
@@ -523,15 +534,18 @@ public class ChessGame {
         System.out.println();
         System.out.println(">> Information Commands:");
         System.out.println("  pip            - Show all valid moves for current player");
+        System.out.println("  display        - Toggle between bracketed [P] and Unicode ♔ symbols");
         System.out.println();
         System.out.println(">> File Commands:");
         System.out.println("  save <name>    - Save current game (e.g., 'save mygame')");
         System.out.println("  load <name>    - Load saved game (e.g., 'load mygame')");
         System.out.println();
+        System.out.println(">> Display Modes:");
+        System.out.println("  * Standard: [P] (p) - Colored bracketed notation (default)");
+        System.out.println("  * Unicode: ♔ ♕ ♖ ♗ ♘ ♙ - Requires Unicode-capable terminal");
+        System.out.println();
         System.out.println(">> Notes:");
         System.out.println("  * Square notation: a1 to h8 (files a-h, ranks 1-8)");
-        System.out.println("  * White pieces: [P] [R] [N] [B] [Q] [K]");
-        System.out.println("  * Black pieces: (p) (r) (n) (b) (q) (k)");
         System.out.println("  * Special moves: castling, en passant, pawn promotion");
         System.out.println("  * All moves and events are logged automatically");
         System.out.println("===========================");
@@ -805,5 +819,27 @@ public class ChessGame {
         char file = (char) ('a' + pos.getColumn());
         int rank = 8 - pos.getRow();
         return "" + file + rank;
+    }
+
+    /**
+     * Toggle the display mode between UNICODE and COLORED_BRACKETED.
+     */
+    private void toggleDisplayMode() {
+        if (currentDisplayMode == Piece.DisplayMode.UNICODE) {
+            currentDisplayMode = Piece.DisplayMode.COLORED_BRACKETED;
+            System.out.println("Display mode changed to: Standard Bracketed (with colors)");
+            System.out.println("Example: [P] (p) - Yellow for white, cyan for black");
+        } else {
+            currentDisplayMode = Piece.DisplayMode.UNICODE;
+            System.out.println("Display mode changed to: Unicode Chess Symbols");
+            System.out.println("Example: ♔ ♕ ♖ ♗ ♘ ♙ (if your terminal supports Unicode)");
+        }
+        
+        // Update the board's display mode
+        board.setDisplayMode(currentDisplayMode);
+        
+        System.out.println("Note: You'll see the change on the next board display.");
+        System.out.println("Current board:");
+        displayBoard(); // Show the change immediately
     }
 }

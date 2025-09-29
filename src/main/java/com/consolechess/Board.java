@@ -74,6 +74,9 @@ public class Board {
     // Game state
     private final Piece[][] squares;
     
+    // Display configuration
+    private Piece.DisplayMode displayMode = Piece.DisplayMode.COLORED_BRACKETED;
+    
     // Castling rights tracking
     private boolean whiteKingMoved;
     private boolean blackKingMoved;
@@ -910,6 +913,28 @@ public class Board {
         return new Position(row, col);
     }
     
+    /**
+     * Set the display mode for piece rendering.
+     * 
+     * @param mode the display mode to use (not null)
+     * @throws IllegalArgumentException if mode is null
+     */
+    public void setDisplayMode(Piece.DisplayMode mode) {
+        if (mode == null) {
+            throw new IllegalArgumentException("Display mode cannot be null");
+        }
+        this.displayMode = mode;
+    }
+    
+    /**
+     * Get the current display mode.
+     * 
+     * @return the current display mode
+     */
+    public Piece.DisplayMode getDisplayMode() {
+        return displayMode;
+    }
+    
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
@@ -920,9 +945,14 @@ public class Board {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 Piece piece = squares[row][col];
                 if (piece != null) {
-                    sb.append(piece.toString()).append(" ");
+                    sb.append(piece.toString(displayMode)).append(" ");
                 } else {
-                    sb.append(" .  ");  // Empty square with spacing to match piece width
+                    // For Unicode mode, use different empty square representation
+                    if (displayMode == Piece.DisplayMode.UNICODE) {
+                        sb.append(" · ");  // Unicode middle dot for empty squares in Unicode mode
+                    } else {
+                        sb.append(" . ");  // Regular dot for other modes
+                    }
                 }
             }
             sb.append(8 - row).append("\n");
