@@ -199,8 +199,8 @@ Display mode changed to: Unicode Chess Symbols
 Example: ♔ ♕ ♖ ♗ ♘ ♙ (if your terminal supports Unicode)
 
 # Board now shows:
-8 ♜ ♞ ♝ ♛ ♚ ♝ ♞ ♜ 8
-7 ♟ ♟ ♟ ♟ ♟  ·  ♟ ♟ 7
+8  ♜   ♞   ♝   ♛   ♚   ♝   ♞   ♜  8
+7  ♟   ♟   ♟   ♟   ♟   .   ♟   ♟  7
 
 Enter your move: display
 Display mode changed to: Standard Bracketed (with colors)
@@ -456,9 +456,17 @@ Example log files:
 
 - 🎨 **Unicode Display Toggle**: Added `display` command to switch between [P] and ♔ symbols
 - 🐛 **Board Alignment Fix**: Perfect spacing alignment for empty squares
-- 🐛 **Encoding Fixes**: Removed Unicode bullet points causing margin display issues
+- 🐛 **Unicode Display Improvements**: Fixed Unicode mode alignment and padding issues
+- 🐛 **Encoding Fixes**: Removed Unicode bullet points and corrupted characters
 - 🗂️ **Git Repository Cleanup**: Removed user save files from version control
 - 📦 **JAR Updates**: Rebuilt with all latest display and alignment features
+
+### 📝 **Display Mode Details**:
+
+- **Standard Mode**: Uses `[P] (p)` notation - 3 characters + space = 4 total per square
+- **Unicode Mode**: Uses `♔ ♕ ♖` symbols - padded to 3 characters + space = 4 total per square
+- **Alignment**: Both modes now use identical spacing for perfect column alignment
+- **Compatibility**: Unicode mode works if your terminal supports Unicode fonts
 
 - **v1.0.1**:
 
