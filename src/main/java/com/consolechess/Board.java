@@ -945,14 +945,22 @@ public class Board {
             for (int col = 0; col < BOARD_SIZE; col++) {
                 Piece piece = squares[row][col];
                 if (piece != null) {
-                    sb.append(piece.toString(displayMode)).append(" ");
-                } else {
-                    // Empty square: make it exactly 4 characters to match piece + space format
                     if (displayMode == Piece.DisplayMode.UNICODE) {
-                        sb.append(" ·  ");  // space-dot-space-space = 4 chars total
+                        // Unicode symbols are 1 char, so pad to 3 chars to match [P] width
+                        String unicodeSymbol = piece.toString(displayMode);
+                        sb.append(" ").append(unicodeSymbol).append(" ").append(" ");
                     } else {
-                        sb.append(" .  ");  // space-dot-space-space = 4 chars total  
+                        // Standard bracketed notation: [P] + space
+                        sb.append(piece.toString(displayMode)).append(" ");
                     }
+                } else {
+                    // Empty square: exactly 4 characters total for consistent alignment
+                    if (displayMode == Piece.DisplayMode.UNICODE) {
+                        sb.append(" . ");  // Use regular dot, not Unicode middle dot to avoid corruption
+                    } else {
+                        sb.append(" . ");  // Standard dot format
+                    }
+                    sb.append(" ");  // Trailing space for 4-character total
                 }
             }
             sb.append(8 - row).append("\n");
