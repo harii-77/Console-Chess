@@ -12,7 +12,7 @@ import java.util.Objects;
  * <p>The class supports various display modes:</p>
  * <ul>
  *   <li>Colored terminal output with ANSI escape codes</li>
- *   <li>Unicode chess symbols (♔♕♖♗♘♙ for white, ♚♛♜♝♞♟ for black)</li>
+ *   <li>Unicode chess symbols (white king, queen, rook, etc. and black equivalents)</li>
  *   <li>Traditional bracketed notation ([K] for white, (k) for black)</li>
  *   <li>Plain text notation (K, k)</li>
  * </ul>
@@ -38,7 +38,7 @@ public class Piece {
     public enum DisplayMode {
         /** Colored bracketed notation: yellow [K] for white, cyan (k) for black */
         COLORED_BRACKETED,
-        /** Unicode chess symbols: ♔ for white king, ♚ for black king */
+        /** Unicode chess symbols: white king symbol for white king, black king symbol for black king */
         UNICODE,
         /** Plain bracketed notation: [K] for white, (k) for black */
         PLAIN_BRACKETED,
@@ -171,7 +171,7 @@ public class Piece {
     /**
      * Returns the Unicode chess symbol for this piece.
      * 
-     * @return the Unicode symbol (e.g., ♔ for white king, ♚ for black king)
+     * @return the Unicode symbol (e.g., white king symbol for white king, black king symbol for black king)
      */
     public String getUnicodeSymbol() {
         return type.getUnicodeSymbol(color);

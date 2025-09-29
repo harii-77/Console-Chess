@@ -16,22 +16,22 @@ package com.consolechess;
 public enum PieceType {
     
     /** Pawn piece - moves forward, captures diagonally */
-    PAWN("Pawn", "P", 1, "♙", "♟"),
+    PAWN("Pawn", "P", 1, "\u2659", "\u265F"),
     
     /** Rook piece - moves horizontally and vertically */
-    ROOK("Rook", "R", 5, "♖", "♜"),
+    ROOK("Rook", "R", 5, "\u2656", "\u265C"),
     
     /** Knight piece - moves in L-shape */
-    KNIGHT("Knight", "N", 3, "♘", "♞"),
+    KNIGHT("Knight", "N", 3, "\u2658", "\u265E"),
     
     /** Bishop piece - moves diagonally */
-    BISHOP("Bishop", "B", 3, "♗", "♝"),
+    BISHOP("Bishop", "B", 3, "\u2657", "\u265D"),
     
     /** Queen piece - most powerful, combines rook and bishop moves */
-    QUEEN("Queen", "Q", 9, "♕", "♛"),
+    QUEEN("Queen", "Q", 9, "\u2655", "\u265B"),
     
     /** King piece - most important, game ends when captured */
-    KING("King", "K", Integer.MAX_VALUE, "♔", "♚");
+    KING("King", "K", Integer.MAX_VALUE, "\u2654", "\u265A");
     
     // Instance variables for enhanced functionality
     private final String displayName;

@@ -190,11 +190,11 @@ public class ChessGame {
      * Display the welcome message and game title.
      */
     private void displayWelcomeMessage() {
-        System.out.println("╔═══════════════════════════╗");
-        System.out.println("║    Welcome to Console     ║");
-        System.out.println("║         CHESS!            ║");
-        System.out.println("║    Advanced Edition       ║");
-        System.out.println("╚═══════════════════════════╝");
+        System.out.println("=============================");
+        System.out.println("|    Welcome to Console     |");
+        System.out.println("|         CHESS!            |");
+        System.out.println("|    Advanced Edition       |");
+        System.out.println("=============================");
         System.out.println();
     }
     
