@@ -27,12 +27,9 @@ public class Piece {
     private static final String ANSI_RESET = "\u001B[0m";
     private static final String ANSI_BRIGHT_CYAN = "\u001B[96m";
     private static final String ANSI_YELLOW = "\u001B[93m";
-    private static final String ANSI_BRIGHT_WHITE = "\u001B[97m";
-    private static final String ANSI_BRIGHT_BLACK = "\u001B[90m";
     
     // Configuration options
     private static final boolean USE_COLORS = true;
-    private static final boolean USE_UNICODE_DEFAULT = false;
     
     /** Display mode enumeration for different piece representations */
     public enum DisplayMode {

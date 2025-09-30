@@ -1,7 +1,6 @@
 package com.consolechess;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Represents a chess board with comprehensive game state management and move validation.
@@ -421,7 +420,12 @@ public class Board {
             return false;
         }
         
-        boolean isKingSide = to.getColumn() == 6;
+        boolean isKingSide = to.getColumn() == KINGSIDE_KING_TARGET;
+        boolean isQueenSide = to.getColumn() == QUEENSIDE_KING_TARGET;
+        
+        if (!isKingSide && !isQueenSide) {
+            return false; // Invalid castling target
+        }
         
         // Check rook position and movement
         if (isKingSide) {
@@ -896,7 +900,7 @@ public class Board {
                 }
             }
             
-            return true;
+            return foundBoard;
         } catch (Exception e) {
             return false;
         }
