@@ -1,7 +1,7 @@
 # Console Chess - Project Progress Report
 
 ## Student Information
-**Student Name:** Hariharan Murugan  
+**Student Name:** 
 **Project:** Console Chess - Advanced Java Implementation  
 **Version:** 1.1.0  
 **Report Date:** October 7, 2025  
@@ -354,4 +354,4 @@ java -jar junit-platform-console-standalone-1.10.2.jar \
 
 **Report Generated:** October 7, 2025  
 **Project Version:** 1.1.0  
-**Student:** Hariharan Murugan
+**Student:** 
